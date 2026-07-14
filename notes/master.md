@@ -56,6 +56,77 @@
 * Alternative hypothesis:
   * H_1 = B_1 > 0
 * In statistics, bootstrapping refers to sampling from our original sample with replacement to generate a bootstrap sampling distribution. The idea is to use the original sample as an estimate of the unknown population.
+* Relationship between 2 sample T-test and regression
+  * TODO
+* If it is not continous, you cannot use linear regression
+* You will never know B_1, but you can determine B1_hat
+* What is the difference between SD and SE?
+  * SD(y_bar) = sigma / sqrt(n)
+  * SE(y_bar) = sigma_hat / sqrt(n)
+  * SE is an ESTIMATION of the SD since SD has something that is unknown (since sigma is unknown)
+* When you have several different values for B0_hat and B1_hat from different samples, you cannot tell which one is the best estimate, however you can use them to create a sampling distribution
+* Inference: althought we don't know the value of B1, we can be 95% confident that the number is between the cofidence interval. For a 95% confidence interval, 95% of the time the value would lie between these two intervals
+* One way of conducting inference is confidence intervals and the other way is by using hypothesis testing
+* The smaller the p-value, the stronger the evidence against H_0
+* Two ways for inference of B_1
+  * 95% C.I. for B1 (note: 95% is most commonly used, but you can use different numbers for this)
+  * Test hypotheses: H0: B1 = 0 vs. H1: B1 != 0 (d=0.05)
+* What is the relationship between CI and hypothesis testing?
+  * 95% CI of B1 covers 0 *is equivalent to* fail to reject H0 at 5% level
+* Just use Z instead of using a t-test ("don't worry about T")
+* How do we know the sampling distribution of the estimators of the regression coefficients?
+  * We have different wats of answering this question:
+    * Use a theoretical result. This is what lm does.
+      * You need assumptions such as normal distribution.
+    * Use boostrapping.
+* Note: When doing exercises that use bootstrap, you should try writing this code independently
+* This course will not emphasize too much on bootstrap
+* Q: What is the SE for sample mean (y_bar)?
+  * A: SE(y_bar) = s/sqrt(n) where s = simga_bar
+* Q: What is the SE of correlation r?
+  * A: Use bootstrap
+* Q: What is the SE of median?
+  * A: Use boostrap
+* Code example for using bootstrap:
+
+```R
+data = c(1, 3, 4, 9)
+median(data)
+boot1 = sample(data, 4, replace=T)
+boot1
+m1 = median(boot1)
+m1
+boot2 = smaple(data, 4, replace=T)
+boot2
+m2 = median(boot2)
+m2
+```
+
+* Does the number of replicates matter?
+
+  * The approximated sampling distribution becomes smoother.
+  * If B >= 100, then this is typically sufficient. Making it much larger than this may require significant computational power.
+* A lot of models rely on iterative algorithms (TODO)
+* Types of models (TODO):
+
+  * Frequestist <- likelihood methods
+  * Bayesian
+* `Bayes formula = f(theta | y) = (f(y | theta)f(theta)) / f(y)`
+
+  * f(y) can be calculated using integral of f(y|theta)f(theta)dtheta
+* MCMC (TODO)
+
+  * Not easy to implement -> requires significant computing power
+* EM algorithm (TODO)
+* CLT says....
+
+  * `sqrt(n)*(y_bar - mu) ->d-> N(0, sigma^2) as n goes to inf`
+* Bootstrap methods work for ANY SAMPLE SIZE and ANY DISTRIBUTION (no matter how complicated the estiamte may be)
+* Boostrap confidence intervals
+
+  * Standard error method: use the list of bootstrap estimates to approximate (only) the SE of the estimator
+  * Percentile method: use the list of bootstrap estimates to the ratnge using quantiles
+* The p-values computed by the function `lm` are based on classical theoretical approximations or experimen
 
 ### Topic 1 Questions:
 
@@ -70,8 +141,22 @@
         * Q: How do you know if B0_hat and B1_hat are good?
           * A: True value of B1 may be between B1_hat - 1.96xSE(B1_hat) and B1_hat + 1.96xSE(B1_hat). Hypothesis testing is equivalent to confidence intervals. SE(B1_hat) is the unceratinty of the estimate.
 
+### Clicker Questions
+
+* If x and y has a positive correlation, the regression of y on x has a positive slope
+  * A: TRUE
+  * `B1_hat = correlation * s_y/s_x` therefore we can rewrite this in terms of correlation
+* If x and y has a positive correlation, the higher the correlation, the larger the slope of teh regression of y on x
+  * A: Poorly designed question
+* The regression of y on x is the same as the regression of x on y.
+  * A: FALSE
+  * `y = B0 + B1X` therefore `x = -B0/B1 + (1/B1)*y` these two equations are not the same
+* 
+
 ---
 
-# Topic 2 Notes:
+# Topic 2 Notes: Multiple Linear Regression
+
+* Categorical variables have two
 
 ### Topic 2 Questions:
