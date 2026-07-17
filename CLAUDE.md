@@ -4,6 +4,11 @@ Personal coursework directory: lecture notes, slides, in-class notebooks, data, 
 assignments. Not a software project — the "code" is R inside Jupyter notebooks used to
 follow along with the course.
 
+**Interpretation is a large priority of this course.** The emphasis is on explaining what
+models and results *mean* (coefficients, associations, inference) in plain language, not
+just producing correct code or numbers. When helping, favor clear interpretation of the
+statistics over mechanical output.
+
 ## Layout
 
 | Directory | Contents |

@@ -157,6 +157,86 @@ m2
 
 # Topic 2 Notes: Multiple Linear Regression
 
-* Categorical variables have two
+* Categorical variables when using MLR are separated out into differnt
+* y = beta_0 + beta_1(state) + epilson and t_test are equivalent with SIMPLE LINEAR REGRESSION
+* The first level in MLR is the reference level. The default is 0, but you can change this in R. When you have 2 categories, the default reference level is 0.
+* Linear regression can be written using conditional expection in addition to the typical linear regression formula
+* When you are using two different categories, the slope that the linear model defines is the difference level between the response varibale in category 1 and the response variable in category 2
+* If you have two categories, you can simply have one variable ->  0 and 1. When there are more than 2 levels, this gets more complicated.
+
+  * We have 2 dummy variables for 3 levels. The reference level is 0 by default.
+  * `e.g.` X = 0 -> Indiana, 1 -> Washington, 2-> Kansas. X = 0 would mean Kansas
+* When you have 2 groups, you can simply use a t-test, but what can you use when there are 3 groups?
+
+  * A: ANOVA is used or you can use SLR with state
+* Additive model: `beta_0 + beta_1 * X_1 + beta_2 * X_2 + ep`
+* TODO: Additive vs. non-additive models
+* One hot encoding gives `k` columns whereas dummy variable encoding gives `k-1` columns
+* TODO: interaction vs. non-interaction and how to determine it visually
+* Question: How do we know there is an interaction?
+
+  * A: You test the null hypothesis (`H_0: beta_3 = 0 (no interaction)` `H_1 :beta_3 != 0 (there is an interaction))`
+  * If H_0 is rejected at 5% level, interaction **may** exist
+  * Z = beta_3/SE(beta_3) ~ N(0,1) calculate the p-value based on the standard normal distribution
+  * TODO: "power"
+* **In a MLR the response is always a continuous variable**
 
 ### Topic 2 Questions:
+
+### Topic 2 Tutorial/Worksheet:
+
+---
+
+### Topic 3 Notes:
+
+* Review from topic 2:
+
+  * MLR models are the most commonly used models (this is why they are especially important)
+  * You can't draw pictures as the number of predictors grows
+  * Input variables = predictors, covariates, independent variables
+  * y=beta_0 + beta_1X_1 +  beta_2X_2 + eps
+
+    * y must be continuous
+    * Once you let R know that a particular variable is a factor, it can differentiate the different categories rather than treating it like numerical data
+      * `factor(x2)` `as.factor(x2)`
+    * R will automatically choose the first category as the reference category
+  * We use **additive** models because they are simple
+
+    * The types can be continuous or categorical
+  * Interaction
+
+    * y = beta_0 +beta_1X1 + beta_2X2 + beta_3X1X2 + eps
+    * The product term is the interaction term
+    * To determine if you actually need the interaction term, you use a hypothesis test
+      * H_0: beta_3 = 0
+      * H_1: beta_3 != 0
+    * One of the interpretation difficulties is **interaction**
+* All models need assumptions
+
+  * Without assumptions, you **cannot do anything** since the derivations are all derived based on assumptions
+  * y = beta_0 + beta_1X1 _ beta_2X2 + eps ==> y = f(x1, x2) + eps
+  * You must assume the distribution of the error. In order to get the probability, you have to get the distribution.
+  * When you are assuming a distribution, the most common is a **normal distribution**
+  * LINE acronym. Without these assumptions, you cannot get the p-value or estimates.
+
+    * Linear
+    * Independence
+    * Normality
+    * Constant variance (i.e. variance doesn't change)
+* A linear model is defined by the parameters (the beta values)
+* If independence is violated, then the estimates would be biased. The hypothesis tests would be invalid.
+* TODO: constant variance assumption
+* "A model should be simple, but not TOO simple"
+* Log(Y) and sqrt(Y) can be used to stabalize the function. Note that log is typically better than sqrt
+* Without normal distribution, it would be difficult to compute the p-value
+* Multicollinearity
+
+  * strong association between two or more covariates
+  * multicollinearity inflates the standard errors of our estimates
+  * Pairwise correlation: correlation between each pair of covariates
+* VIF: variance inflation factor -> formal way to check the multicollinearity
+
+  * If it is higher than 5 or 10, this suggests collinearity might be a problem
+  * Generalized VIF is preferred because the VIF of categorical covariates are affected by the number of categories they have
+* Degrees of freedom  = # of predictors - 1
+*

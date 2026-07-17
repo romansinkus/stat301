@@ -1,3 +1,4 @@
+
 # Topic 1: Simple Linear Regression (SLR)
 
 Consolidated notes drawn from the lecture slides (`topic1_..._part1/2.pdf`), the
@@ -17,11 +18,13 @@ explanatory and predictive modelling.
 
 **Deterministic relation** — the value of one variable is *entirely* determined by another.
 No uncertainty.
+
 - Einstein's mass–energy: `E = m·c²`
 - Circle area–radius: `A = πr²`
 
 **Stochastic relation** — the outcome of a given input *cannot* be precisely predicted.
 There is **uncertainty**, due to other variables not being considered or noise.
+
 - Height vs. weight — taller people tend to weigh more, but with considerable variability.
 - Home price vs. square footage.
 
@@ -32,7 +35,9 @@ This lets two people with the same height have different weights.
 **Our focus is exclusively on stochastic relations.**
 
 ### Shape of a relation
+
 Categorized by the form of the model equation:
+
 - Linear: `Weight = β₀ + β₁·Height + ε`
 - Quadratic: `A = π·r²`
 - Exponential: `N = N₀·e^(−λt)·ε`
@@ -41,13 +46,13 @@ Categorized by the form of the model equation:
 
 ## 2. Terminology
 
-| Response (Y) | Predictor (X) |
-|---|---|
-| output variable | feature |
-| ~~dependent variable~~ (avoid!) | input variable |
-| | covariate |
-| | regressor |
-| | ~~independent variable~~ (avoid!) |
+| Response (Y)                     | Predictor (X)                      |
+| -------------------------------- | ---------------------------------- |
+| output variable                  | feature                            |
+| ~~dependent variable~~ (avoid!) | input variable                     |
+|                                  | covariate                          |
+|                                  | regressor                          |
+|                                  | ~~independent variable~~ (avoid!) |
 
 - The **response** is the variable we're interested in (trying to predict/explain).
 - `Xᵢ`, `Yᵢ` = values of X and Y for observation `i`. Think of `n` pairs:
@@ -72,6 +77,7 @@ Yᵢ = β₀ + β₁·Xᵢ + εᵢ
   everything the model does not.
 
 ### The model as a conditional expectation
+
 The regression line is the **conditional average of Y for a given X**:
 
 ```
@@ -86,13 +92,16 @@ Example: for `Weight = −166 + 140·Height + ε`, a 1.63 m person has
 line gives the **mean** weight of people of a given height.
 
 ### The random errors
+
 We treat `εᵢ` as a random variable:
+
 - **Distribution:** assumed **Normal**.
 - **Mean:** safely assumed to be **0**.
 - **Variance:** unknown, denoted **σ²** (assumed constant across all errors, and errors
   uncorrelated — "homoscedastic").
 
 ### Interpretation of β₀ and β₁
+
 - **Slope:** a 1-unit increase in X is *associated with* an expected change of β₁ in Y.
   Associated with — **not the cause of**.
 - **Intercept:** average value of Y when X = 0. Usually we don't care much about it.
@@ -117,6 +126,7 @@ sample, producing `β̂₀` and `β̂₁`.
 minimize `Σ(yᵢ − (β̂₀ + β̂₁·xᵢ))²`. Solve `dQ/dβ₀ = 0` and `dQ/dβ₁ = 0`.
 
 Estimators (you do **not** need to memorize these):
+
 ```
 β̂₁ = Σ(Xᵢ − X̄)(Yᵢ − Ȳ) / Σ(Xᵢ − X̄)²
 β̂₀ = Ȳ − β̂₁·X̄
@@ -125,6 +135,7 @@ Estimators (you do **not** need to memorize these):
 Relationship to correlation: `β̂₁ = r · (s_y / s_x)`. A positive correlation ⟹ positive slope.
 
 **In R:** fit with `lm()`.
+
 ```r
 model <- lm(y ~ x, data = df)
 ```
@@ -143,17 +154,21 @@ estimator across samples is its **standard error (SE)** — the SD of its sampli
   *estimate* of the SD (because σ is unknown).
 
 Sampling distributions (assuming Normal, uncorrelated, equal-variance errors):
+
 ```
 β̂₀ ~ N(β₀, [SE(β̂₀)]²)
 β̂₁ ~ N(β₁, [SE(β̂₁)]²)
 ```
+
 `σ²` is unknown and estimated from the residuals: `σ̂² = Σeᵢ² / (n−2)`.
 
 **You need two things for inference:** (1) an unbiased estimate, and (2) its uncertainty (SE).
 *Unbiased* means `E(β̂₁) = β₁` — the estimate is right on average.
 
 ### How do we get the sampling distribution / SE?
+
 Two routes:
+
 1. **Theoretical result** — this is what `lm` does. Requires assumptions (Normal errors, etc.).
 2. **Bootstrapping** — resample; no formula/assumptions needed (see §8).
 
@@ -165,35 +180,45 @@ Two routes:
 ## 6. Two forms of inference
 
 ### (a) Confidence interval for β₁
+
 ```
 CI(β₁, 1−α) = β̂₁ ± t*_{1−α/2} · SE(β̂₁)
 ```
+
 95% is most common. Interpretation: we're 95% confident the true β₁ lies in the interval;
 across repeated samples, 95% of such intervals would cover the true value.
 
 ### (b) Hypothesis test
+
 In SLR the "status quo" is **the absence of a relationship** between response and predictor.
 Testing whether X and Y are linearly related is equivalent to:
+
 ```
 H₀: β₁ = 0   vs.   H₁: β₁ ≠ 0     (default; α often = 0.05)
 ```
+
 (Change H₁ to one-sided if β₁ cannot be positive/negative.) Note: separate tests exist for
 each parameter (intercept and slope).
 
 Test statistic / null model:
+
 ```
 T = (β̂₁ − 0) / SE(β̂₁) ~ t_{n−2}
 ```
+
 **Reject H₀ if p-value < α.**
 
 ### The p-value
+
 The probability of observing a test statistic **at least as extreme** as the one obtained,
 **assuming H₀ is true**. The **smaller the p-value, the stronger the evidence against H₀.**
+
 - It is **NOT** the probability that H₀ is true (it's computed *assuming* H₀).
 - "Fail to reject" ≠ "H₀ is true" — we never *prove* H₀; we only reject or fail to reject.
 - Statistical significance ≠ practical importance.
 
 ### CI ⟺ hypothesis test
+
 > A 95% CI for β₁ that **covers 0** is *equivalent to* **failing to reject H₀** at the 5% level.
 
 Equivalently: |Z| > 1.96 (⟺ p < 0.05) ⟺ the 95% CI excludes 0 ⟺ statistically significant.
@@ -206,6 +231,7 @@ At exactly Z = 1.96 / p = 0.05, 0 sits on the boundary of the CI.
 **Don't mix these two in one pipe.** (Hard-won lesson — see the debugging log at the bottom.)
 
 ### Theory-based path: `lm()` + `broom`
+
 ```r
 library(broom); library(moderndive)
 model <- lm(y ~ x, data = df)
@@ -216,6 +242,7 @@ glance(model)                  # one-row model summary (R², sigma, AIC, …)
 augment(model)                 # data + .fitted, .resid per observation
 confint(model, level = 0.95)   # CI for each coefficient
 ```
+
 - `tidy()` must be given a **model object**, not a data frame. Feeding it a data frame calls
   the deprecated `tidy.data.frame` method, which crashes on non-numeric columns.
 - `moderndive::get_regression_table(model)` is a friendly wrapper around
@@ -223,7 +250,9 @@ confint(model, level = 0.95)   # CI for each coefficient
 - `get_correlation(formula = y ~ x)` / base `cor(df$y, df$x)` for the correlation coefficient.
 
 ### Simulation-based path: `infer`
+
 A fixed sequence of verbs (`specify → hypothesize → generate → calculate`):
+
 ```r
 library(infer)
 boot_dist <- df %>%
@@ -234,6 +263,7 @@ boot_dist <- df %>%
 boot_dist %>% get_ci(type = "percentile", level = 0.95)
 boot_dist %>% visualize()               # for plotting; not geom_histogram() directly
 ```
+
 - Use `specify()`, **not** `lm()`, at the top — `generate()` needs a data frame to resample.
 - `hypothesize()` is only needed for hypothesis tests, not for a bootstrap CI.
 
@@ -258,6 +288,7 @@ Works for **any sample size and any distribution**, no matter how complicated th
 > In practice you only ever have one sample.
 
 ### Two ways to build a bootstrap CI
+
 - **Standard-error (normal) method:** use the bootstrap estimates to approximate the SE,
   then `estimate ± 1.96·SE`. Assumes the bootstrap distribution is ~symmetric/normal.
 - **Percentile method:** take the empirical **quantiles** of the bootstrap estimates directly
@@ -269,6 +300,7 @@ summarise(avg      = mean(value),
           lower_ci = quantile(value, 0.025),
           upper_ci = quantile(value, 0.975))
 ```
+
 ⚠️ When `value` is already a **bootstrap distribution of a statistic**, `sd(value)` *is* the
 SE — do **not** divide by √n again.
 
@@ -278,16 +310,21 @@ SE — do **not** divide by √n again.
 
 A predictor can be **categorical**. To put a category in an equation, encode it as a **dummy
 variable**. For 2 categories you need only **1** dummy:
+
 ```
 sexᵢ = 0 if female, 1 if male
 body_mass_gᵢ = β₀ + β₁·sexᵢ + εᵢ
 ```
+
 There is no line here — `sex` is only 0 or 1. The model reduces to two group means:
+
 ```
 body_mass_gᵢ = β₀ + εᵢ            if female (reference level)
              = β₀ + β₁ + εᵢ        if male
 ```
+
 So:
+
 - **β₀** = average response of the **reference** group (female).
 - **β₁** = the **difference** in means.
 - **β₀ + β₁** = average response of the other group (male).
@@ -297,6 +334,7 @@ Testing `H₀: β₁ = 0` (means are equal) is **equivalent to a two-sample t-te
 statistics/p-values match.
 
 In R, just make the variable a **factor** and `lm` builds the dummies and names the level:
+
 ```r
 df %>% mutate(sex = as_factor(sex))
 lm(body_mass_g ~ sex, data = df)      # term "sexmale" is β₁
@@ -307,6 +345,7 @@ lm(body_mass_g ~ sex, data = df)      # term "sexmale" is β₁
 ## 10. Two important cautions
 
 **Regression vs. correlation analysis:**
+
 - *Correlation analysis* — strength of linear association between two variables; **no**
   response/covariate distinction; **both** variables assumed stochastic.
 - *Linear regression* — estimates the conditional **average** of the response given the
@@ -324,12 +363,14 @@ range of X — the relationship can differ substantially there.
 ## 11. Worked examples
 
 ### Wage vs. Education (activity 1 — `wage.txt`)
+
 - Scatterplot shows a **weak but positive** linear relationship.
 - `get_correlation(wage ~ education)` ≈ **0.382** — weak, positive; consistent with the plot.
   (`cor()` gives the same value.) Correlation ≠ causation.
 - `lm(wage ~ education)` gives a positive slope ≈ **0.750** — consistent with A & B.
 
 ### Wage vs. Education — inference (activity 2)
+
 - p-value for the `education` slope ≈ **0** < 0.05 ⟹ relationship is **statistically
   significant**.
 - 95% CI for β₁ ≈ **(0.596, 0.905)** — excludes 0 ⟹ reject H₀ (significant at 5%),
@@ -337,6 +378,7 @@ range of X — the relationship can differ substantially there.
 - Z-statistic ≈ 9.53 > 1.96 and p ≈ 0 ⟺ CI excludes 0. All three tell the same story.
 
 ### Penguins (slides — `body_mass_g ~ flipper_length_mm`)
+
 - `confint()`: 95% CI for the flipper slope ≈ **(47.12, 53.18)** g per mm.
 - `tidy(conf.int = TRUE)`: slope estimate ≈ 50.15, p ≈ 0 ⟹ reject `H₀: β₁ = 0`.
 - Bootstrap percentile CI for the slope ≈ **(47.28, 53.10)** — close to the theory CI.
@@ -352,8 +394,10 @@ Worksheet 01 ("Introduction to Generative Modelling") walks the whole SLR pipeli
 `lm_boot250` / `boot_SLR_CIs` code.
 
 ### Framing: the three aspects of linear models
+
 Linear regression is a **generative model** — it approximates the underlying mechanism that
 generated the data. Research focuses on three intimately-connected aspects:
+
 - **Estimation:** estimate the true (unknown) relation between response and inputs.
 - **Inference:** use the model to infer information about that unknown relation.
 - **Prediction:** use the model to predict the response for *new* observations.
@@ -361,7 +405,9 @@ generated the data. Research focuses on three intimately-connected aspects:
 ("*Simple*" in SLR means **one** input variable — not that it's easy.)
 
 ### The dataset & question
+
 `US_cancer_data` — cancer mortality and demographics for US counties (n = 3047).
+
 - `TARGET_deathRate` — cancer deaths per 100,000 (2010–2016 avg) → **response (Y)**
 - `povertyPercent` — % of county population in poverty → **input (X)**
 - `PctPrivateCoverage` — % with private health coverage
@@ -372,6 +418,7 @@ causation** — so the correct slope interpretation is *"a one-unit increase in 
 **associated with** a 1.52 increase in mortality"* (not "causes", not "the effect of").
 
 ### Part I — Estimation
+
 - Choosing the "best" line = the line that **minimizes the distance of points to the line**,
   where distance is the **vertical** gap (the residual — we're explaining Y). ⟹ **Least Squares**.
 - Fit with `lm(formula = TARGET_deathRate ~ povertyPercent, data = US_cancer_sample250)`.
@@ -384,6 +431,7 @@ causation** — so the correct slope interpretation is *"a one-unit increase in 
   **prediction**.
 
 ### Part II — Inference
+
 - **Estimators are random variables.** `β̂₀`, `β̂₁` depend on the sample, so different samples
   give different estimates (the worksheet builds a `many_SLR` table by drawing several fresh
   samples). ⚠️ Drawing multiple fresh samples from the full dataset is a **pedagogical**
@@ -391,10 +439,10 @@ causation** — so the correct slope interpretation is *"a one-unit increase in 
   replacement). In practice you only ever have one sample.
 - **Standard error** = SD of that sampling distribution; get it two ways — (1) theoretical
   result (`lm`), or (2) bootstrapping.
-- `tidy(SLR_cancer_sample250)` → the coefficient table (`term, estimate, std.error,
-  statistic, p.value`); `mutate_if(is.numeric, round, 2)` to tidy the display.
+- `tidy(SLR_cancer_sample250)` → the coefficient table (`term, estimate, std.error, statistic, p.value`); `mutate_if(is.numeric, round, 2)` to tidy the display.
 
 **Hypothesis test (careful with hats!):**
+
 - Correct null is about the **population parameter**: `H₀: β₁ = 0` (**not** `β̂₁ = 0`).
 - For a *positive* association, the alternative is one-sided: `H₁: β₁ > 0`.
 - **p-value MCQ (worksheet's own emphasis):** the only correct statement is *"the p-value is
@@ -407,16 +455,19 @@ causation** — so the correct slope interpretation is *"a one-unit increase in 
   ASA statement) — p-values are widely misused.
 
 **Confidence interval:**
+
 - `SLR_cancer_sample250 %>% tidy(conf.int = TRUE)` → asymptotic 95% CI per coefficient.
 - ⚠️ Interpretation caveat: once computed from the data, **nothing is random** — the interval
   either covers the true value or it doesn't. The "95%" refers to the *procedure* across
   repeated samples, not a probability for this one interval.
 
 ### Sampling distribution via bootstrapping ("case bootstrapping")
+
 Steps: (1) resample with replacement to get B samples of size n; (2) fit the SLR on each;
 (3) the B estimates approximate the sampling distribution (and give its mean & SE).
 
 Two ways to generate the bootstrap estimates:
+
 ```r
 # (a) base R — replicate + lm + extract coefficients
 set.seed(123); n <- 250; B <- 1000
@@ -432,6 +483,7 @@ bootstrap_slope_infer <- US_cancer_sample250 %>%
   generate(reps = 1000, type = "bootstrap") %>%
   calculate(stat = "slope")           # columns: replicate, stat
 ```
+
 (Same seed ≠ identical results across the two methods — they resample differently.)
 Visualize with a histogram of `boot_slope`, or `bootstrap_slope_infer %>% visualize()`.
 
@@ -440,6 +492,7 @@ distribution of the slope gets **tighter as n increases** (its center stays roug
 same). Larger samples ⟹ less estimator variability ⟹ narrower intervals.
 
 ### Bootstrap percentile CI (Question 7.3 — the one debugged earlier)
+
 ```r
 boot_SLR_CIs <- lm_boot250 %>%
   pivot_longer(cols = contains('boot'), names_prefix = 'boot_', names_to = 'statistic') %>%
@@ -453,6 +506,7 @@ percentile_ci <- bootstrap_slope_infer %>%
   get_confidence_interval(type = "percentile", level = 0.95)
 bootstrap_slope_infer %>% visualize() + shade_confidence_interval(endpoints = percentile_ci)
 ```
+
 The worksheet **explicitly asks for the percentile method** — hence `quantile()`, not
 `mean ± 1.96·sd`. (See the debugging appendix for every trap this question triggered.)
 
@@ -464,6 +518,7 @@ Tutorial 01 covers the same learning objectives as the worksheet but on a differ
 and adds a proper **Exploratory Data Analysis (EDA)** workflow up front.
 
 ### Warm-up fundamentals (T/F)
+
 - The variable being *explained* (e.g. a newborn's birth weight) is the **response**. ✓
 - SLR is **not** an exact linear function — `Yᵢ = β₀ + β₁Xᵢ` (without ε) is **false**; the
   model always includes the error term `+ εᵢ`.
@@ -472,16 +527,20 @@ and adds a proper **Exploratory Data Analysis (EDA)** workflow up front.
 - The population coefficient `β₁` is **not** known — it must be estimated. ✓
 
 ### The dataset
+
 `CASchools` from the **`AER`** package (Applied Econometrics with R) — 420 California K–6/K–8
 school districts, 1998–99. Treated as a *random sample*. Variables used:
+
 - `grades` — factor (grade span) · `income` — avg district income ($000s) ·
   `english` — % English learners · `read` — avg reading test score.
-**Question:** is school performance (`read`) associated with family `income`?
+  **Question:** is school performance (`read`) associated with family `income`?
 
 ### EDA workflow (from *The Art of Data Science*, Peng & Matsui)
+
 Data-science work is not linear — it proceeds in **epicycles**. Checklist:
+
 1. Formulate your question · 2. Read your data · 3. Check the packaging ·
-4. Look at the top and bottom · 5. Check your "n"s.
+2. Look at the top and bottom · 5. Check your "n"s.
 
 ```r
 data(CASchools)
@@ -507,9 +566,11 @@ ideal when there are too many variables.
 ```r
 caschools %>% ggpairs(progress = FALSE)
 ```
+
 From the EDA: `income` is **right-skewed**.
 
 ### Fitting the SLR
+
 Key nuance: `read` vs. `income` is **positive but not perfectly linear** across the full
 range — yet an SLR is still a **useful first approximation** (ties back to the *range problem*,
 §10).
@@ -522,16 +583,19 @@ caschools_SLR_results <- tidy(caschools_SLR, conf.int = TRUE) %>%   # conf.level
 ggplot(caschools, aes(x = income, y = read)) +
   geom_point() + geom_smooth(method = "lm", se = FALSE, linewidth = 1.5)
 ```
+
 Slope interpretation (association, not cause): *an increase in average district income is
 associated with an increase in average district reading score.*
 
 ### Inference
+
 - At α = 0.05, `income` **is** statistically associated with `read` (p < 0.05).
 - The p-values from `lm` come from **classical theoretical approximations** — not bootstrap.
 - The relevant **sampling distribution** is the distribution of **β̂₁** (the *estimator* of the
   slope) — not of Y, X, or the true β₁.
 
 ### Bootstrap + percentile CIs (visualized with vertical lines)
+
 ```r
 set.seed(123); n <- 420; B <- 10000        # n = nrow(caschools); B large ⟹ slow
 lm_boot <- replicate(B, {
@@ -546,6 +610,7 @@ ggplot(lm_boot, aes(x = boot_slope)) +
   geom_vline(aes(xintercept = quantile(boot_slope, 0.025)), col = 'blue', linewidth = 1) +
   geom_vline(aes(xintercept = quantile(boot_slope, 0.975)), col = 'blue', linewidth = 1)
 ```
+
 - To bootstrap the **intercept** instead, use the `boot_intercept` column the same way.
 - For a **90%** CI, use the `0.05` / `0.95` quantiles (not `0.025`/`0.975`).
 
@@ -568,6 +633,7 @@ ggplot(lm_boot, aes(x = boot_slope)) +
   CLT — flagged in personal notes as later/aside topics; not core to Topic 1.
 
 ### Clicker questions
+
 - *Positive correlation ⟹ positive regression slope?* **TRUE** — `β̂₁ = r·(s_y/s_x)`.
 - *Higher correlation ⟹ larger slope?* Poorly-designed question (slope also depends on
   `s_y/s_x`, not correlation alone).
