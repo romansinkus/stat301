@@ -224,7 +224,7 @@ m2
     * Normality
     * Constant variance (i.e. variance doesn't change)
 * A linear model is defined by the parameters (the beta values)
-* If independence is violated, then the estimates would be biased. The hypothesis tests would be invalid.
+* If independence is violated, then the **standard errors** of the estimators are biased (the coefficient estimates themselves stay unbiased), so the confidence intervals and hypothesis tests are invalid. (Slide 1.2.2 — same holds for a homoscedasticity violation, slide 1.3.2.)
 * TODO: constant variance assumption
 * "A model should be simple, but not TOO simple"
 * Log(Y) and sqrt(Y) can be used to stabalize the function. Note that log is typically better than sqrt
@@ -239,4 +239,38 @@ m2
   * If it is higher than 5 or 10, this suggests collinearity might be a problem
   * Generalized VIF is preferred because the VIF of categorical covariates are affected by the number of categories they have
 * Degrees of freedom  = # of predictors - 1
+* Confounder: a variable that causes changes in both the response and at least one input variable
+
+  * Example: does smoking cause cancer?
+    * lifestyle could be a confounding variable since lifestyle could affect if someone smokes and affect their probability of having cancer
+* If you want to establish a causal effect, you need to think about HOW the data was collected
+
+  * Example: testing to see if a new drug helps.
+    * Split everyone into two groups: group 1 takes the drug and group 2 gets the placebo. People are randomly assigned into groups (through a process called "randomization"). Then you compare the results.
+    * The randomization eliminates confounders
+* Experimental designs
+
+  * Completely Randomized Desgin (CRD)
+    * Experimental units are randomized throughout the data layout (no correlation between observations)
+  * Randomized Block Design (RBD)
+    * Splits experimental units into homogenous blocks to remove the variance from the nuisance factors. Then randomly assigns treatments to each block. Blocks are similar in all aspects except treatment
+* 
+
+# Topic 4: Logisitc Regression
+
+* The types of regression models are determined by the types of the responses, not the predictors
+* For linear regression models, we assume that teh response is continuous and normally distributed
+* In practice, many responses are binary (only take two values)
+* Variance is completely determined by the mean
+  * E(y) = P(y=1) and Var(y)=P(y=1)(1-P(y=1)) if a RV y is binary, taking only two values (0 and 1)
+* What are you supposed to do if you want regression model of y on x?
+  * A: odds
+* For logistic regression, you use the binomial distribution
+* 
+
+
+### Topic 4 Questions
+
+* Why not discussing the sigmoid function
+* Why did you say "depends" (slide 16)
 *

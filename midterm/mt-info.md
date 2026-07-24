@@ -1,0 +1,13 @@
+
+# Midterm exam information (Thursday, July 23, 2026)
+
+1. The STAT301 midterm exam will be on **Thursday, July 23, 2026, 3:45pm–4:45pm** (60 minutes)** in lecture room (ESB1012), in-person.** Hard copies of the exam will be distributed. You will have **60 minutes** for writing your solutions, 15 minutes (4:45pm – 5:00pm) for uploading your solution in **a single pdf file** to **Canvas “Assignment” section** (click “**Midterm Solutions upload here**” link).
+2. The midterm exam will focus on ***understanding** *of the basics of linear regression models, and **critical thinking**. It will cover materials up to (include) the materials covered in the class on Tuesday, July 21. The **midterm format** will be **written answers** to questions requiring you to show your understanding of the materials covered in class in a specific context/dataset (some may involve simple calculations), such as interpretations of R outputs and explanations on certain parts of the models. No multiple choice questions for the midterm.
+3. **You will be asked to upload your solutions to Canvas in a single pdf file** . You have at least two options for writing and uploading your exam solutions: 1) hand-write your solutions on the exam papers in the space provided, scan it, and then upload a single pdf file to Canvas; or 2) write your solutions on (say) OneNote, save it as a single pdf file, and then upload it to Canvas. You may also use other methods, as long as you upload a single pdf file of your
+   solutions to Canvas. Your solution file name should be in the format of LastName-FirstName.pdf, e.g.,
+   Wu-Lang.pdf. At the end of the exam, please also hand in the hard copies of your exam/solutions.
+4. There will be some **simple calculations**. So, please bring a simple calculator. R code will not be directly tested, but you need to understand the materials illustrated in R in lectures and assignments.
+5. You must show the **key steps/procedures **of your solutions (unless indicated otherwise). Marking scheme: 70% for correct procedures, and 30% for correct answers. For questions requiring  **answers *in words*** , it is your responsibility to ***write clearly*** (easy to read for graders), or you may lose points.
+6. The midterm exam is  **closed books/notes** . You may bring in  ***one letter-size sheets of notes (both sides, written or typed)*** . You are allowed to access Canvas/Internet only at the end of the exam for uploading your solutions.
+7. **New office hours in the week of July 20-24: T**he usual TA office hour on Friday will be moved to Monday, July 20, at 10am-11am (same Zoom info). The instructor's office hour will be extended to one hour starting the same time.
+8. There will be a **review class** on **Tuesday, July 21**.
