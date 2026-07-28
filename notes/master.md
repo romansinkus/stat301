@@ -266,7 +266,10 @@ m2
 * What are you supposed to do if you want regression model of y on x?
   * A: odds
 * For logistic regression, you use the binomial distribution
-* 
+* Note, there is no error ter since we are modeling a function of the conditional expectation
+* Logistic regression model can ve written as h(E(y_i)) = beta_0 + beta_1*X_1i where h(.) is called a link function. h(x) = log(x/(1-x)) -> logit function
+  * A linear model is h(x)=x, i.e. E(y_i) = beta_0 + beta_1X_1i
+* A model in the form
 
 
 ### Topic 4 Questions
@@ -274,3 +277,8 @@ m2
 * Why not discussing the sigmoid function
 * Why did you say "depends" (slide 16)
 *
+
+# Topic 5: 
+
+
+### Topic 5 Questions
