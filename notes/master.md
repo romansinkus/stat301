@@ -269,16 +269,67 @@ m2
 * Note, there is no error ter since we are modeling a function of the conditional expectation
 * Logistic regression model can ve written as h(E(y_i)) = beta_0 + beta_1*X_1i where h(.) is called a link function. h(x) = log(x/(1-x)) -> logit function
   * A linear model is h(x)=x, i.e. E(y_i) = beta_0 + beta_1X_1i
-* A model in the form
+* A model in the form of h(E(y_i)) = beta_0 + beta_1X_1i is called the generalized linear model (GLM)
+  * `h` is the link function and `beta_0 + beta_1*X_1i` is the linear part
+  * You link the meaning of the response to the linear predictor
+  * Though this part doesn't have to be linear, but we will start with linear for now
+* In logistic regression, you assume a Bernoulli distribution
+* Gaussian = normal distribution
+* Least squares is easier to explain than MLE (maximum likelihood estimators)
+* In your model, if you choose binomial, it assumes you choose logit link
+* Keep in minds that for the interpretation it's in the log-odds scale, though it exhibits the same relationship as the interpretation of linear regression
+* When you exponentiate the coefficients, you can interpret the odds rather than the log-odds
+* In the final, we will have 1 or 2 mathematical application of logistic regression -> "why can you interpret it that way" 
+* You can interpret in the exponential or the non-exponential scale
+  * If you don't take the exponential, the interpretation will be of the log-odds
+  * You can choose which one you want to interpretation
+* (1) Central limit theorem (CLT): If x1, x2, ..., xn which are iid, then you x_bar ->d-> N(mu, sigma^2/n) as n->inf
+  * sqrt(n)(x_bar - mu) ->d-> N(0, sigma^2)
+* (2) MLE beta_hat
+  *  `sqrt(n)(beta_hat-beta) ->d-> N(0, I^-1(beta)) as n-> inf <==> (beta_hat - beta) / SE(beta_hat) ->d-> N(0,1)`
+  *  MLE is optimal
+*  The two things that are most important are estimate and SE
+*  If the p-value is close to the significance level, you have to be careful and look at other things in order be sure about statistical significance
+   *  Statistics is approximate (unlike math) -> Statistical thinking
+*  The default is log-odd, but you can also do odds or probability
+*  On the final, we will need to calculate the log-odd, probability, and log by hand, but typically you can just use software to do this
+*  In a bernoulli distribution, the mean and variance depend on each other, so we cannot compare residuals across observations
+*  **Pearson residuals**: divides the raw residuals by the standard deviation of the response
+   *  More reliable than the raw residual
+   *  we are scaling by the variance because it depends on the variance
+* If you want to create a residual plot while using logistic regression, you should use **pearson residuals** or **standardized residuals**
+* For logistic regression, you should likely just not use the residual plot
+* **Overdispersion** is more important for logistic regression compared to residual plots
+  * The variance in the data is larger than the theoretical variance
+* Interpretation: similar to linear regression models except that the covariate effects are on log(odds) of the response, rather than the response itself
+* Estimation: MLE
 
 
 ### Topic 4 Questions
+* Why don't we always just use the probability? Isn't this the most useful for the real-world?
 
-* Why not discussing the sigmoid function
-* Why did you say "depends" (slide 16)
-*
+### Topic 4 TO STUDY
+* MLE
+* What is link function
+  * what's the difference between the different links
+* When do you treat the predictors as an additive function vs. interaction? I saw that on some slides stuff was added, however on other slides it was multiplied
+* Variance stuff - why can't we use QQ plots for Log Reg?
+  * var(y) = E(y)(1-E(y))
 
-# Topic 5: 
-
+# Topic 5: Poisson Regression
+* Poisson dist: P(Y=k) = (e^(-lambda)*lambda^k)/k!, k=0, 1, 2, 3, ...
+  * E(Y) = lambda
+  * Var(Y) = lambda
+* Overdispersion problem:
+  * In linear models, you don't have to worry about overdispersion since you have Var(Y_i|X_i = sigma^2) -> indep of B's
+* Range problem:
+  * Counts are nonnegative. If you use linear regression, we might have a range problem by predicting negative counts.
+* You can skip the X in E[Y_i|X_i] as long as you understand that it's there
+* The interpretation of the coefficients will be very similar to those of the logistic regression case, except that the covariate effects are on the log-scale instead of the log(odds) scale
+* 
 
 ### Topic 5 Questions
+* Why do we drop the e? I understand this has something to do with e, but I'm not entirely sure.
+
+### Topic 5 TO STUDY
+* Link function
