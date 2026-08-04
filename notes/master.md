@@ -326,10 +326,51 @@ m2
   * Counts are nonnegative. If you use linear regression, we might have a range problem by predicting negative counts.
 * You can skip the X in E[Y_i|X_i] as long as you understand that it's there
 * The interpretation of the coefficients will be very similar to those of the logistic regression case, except that the covariate effects are on the log-scale instead of the log(odds) scale
+* When you take the exponential, the model becomes multiplicative
+* If you want to use the residuals, you have to use the Pearson residuals
+  * Residual plots in general are not very useful though
+  * Overdispersion is  abetter way of evaluating
+* If the dispersion parameter is far from 1, then we know that the Poisson Distribution DOES NOT hold
 * 
 
 ### Topic 5 Questions
 * Why do we drop the e? I understand this has something to do with e, but I'm not entirely sure.
+* On slide 26 of the topic5.1 notes, why do we need separate models for leisure and working days?
+* 
 
 ### Topic 5 TO STUDY
 * Link function
+* Dispersion and overdispersion
+  * Why is a dispersion parameter of 1 significant?
+  
+
+# Topic 6: Model Evaluation (Goodness of Fit)
+* Common issues with models are multicollinearity and interaction
+* R^2: percent of variation in the response that can be explained by the linear model
+  * y = beta_0 + beta_1*X + e
+  * Objective: Where does the variation in y come from
+  * Example: 
+    * y is the score
+    * X is someone's EQ
+  * An r^2value of 20-50% is considered useful. In an observational study, it's more difficult to get a higher r^2 value since there is more noise in these models
+* Null model: model with the intercept only -> no predictions are useful
+* In R, you can use stepwise variable selection using the `step(model)` -> this automatically chooses the useful predictors for you
+  * It doesn't actually understand which predictors are important and which are not
+* `drop1` is also a useful function for variable selection
+  * Works for `glm` and `lm` models
+* Final model should be reasonable
+  * As long as your model is reasonable, you can stop there -> use your judgement.
+  * Do model diagnostics only on the final model
+* If there are outliers, you should remove these (i.e. the residual is massive)
+* How do we know if our model is "better than nothing" (i.e. the null model)
+* R^2 will increase with the number of inputs
+  * It takes into account the number of predictors you have in your model
+  * Therefore, `adjusted R^2` is a more useful metric for your model
+    * It takes into account how many predictors you have
+    * Only for linear models (linear regression) -> NOT for logistic regression
+* 
+
+### Topic 6 Questions:
+* What is the difference between drop1() and step()
+
+### Topic 6 TO STUDY:

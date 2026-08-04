@@ -35,7 +35,13 @@
   * Not-significant is still important
   * We just need to include justification in the conclusion for keeping them in the model
 * Our model can have a single input variable if the other ones we determine are not significant
+
 ---
 
 * Should not use units that are too large or too small
-* 
+* Should look at interaction terms for the project and justify if we want to include or exclude them from the final model
+* If the dispersion value doesn't hold, we should increase the "threshold"
+  * What threshold does this refer to?
+* In the tables, use 2 decimal points
+
+* should include a box plot with the categorical variables
