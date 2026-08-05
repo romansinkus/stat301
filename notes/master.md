@@ -368,7 +368,73 @@ m2
   * Therefore, `adjusted R^2` is a more useful metric for your model
     * It takes into account how many predictors you have
     * Only for linear models (linear regression) -> NOT for logistic regression
-* 
+* R^2: percent of variation in the response TODO (Slide 4)
+* TODO TODO (Slide 4)
+* In R, stepwise variable selection
+  * Forward: start with null model and add predictors
+  * Backward: start with all predictors and remove them
+  * Don't blindly trust the results of this process -> "there is no perfect model"
+    * It's fine if everyone ends up with different models, as long as there are associated justification to go with them
+* Residual: `what you observe` - `what oyu predict`
+* Your model should be at least as good as the null model
+* Explained Sum of Squares (ESS)
+  * y_hat is the predicted value based on a model
+    * y_hat = beta0_hat + beta1_hat*X_i
+  * y_bar is the predicted value based on the null model
+  * variation explained by your model
+* Residual Sum of Squares (RSS)
+  * variation that cannot be explained by the model (or variation from noise)
+  * y = beta_0 + beta_1*X + e -> the RSS aims to explain the error 
+* Total Sum of Squares (TSS)
+  * Total variation
+  * Q: How much is the total variation in the data (response data) that can be explained by your model?
+    * A: Sample variance (S^2): 1/n * sum (from i=1 to n) of (y_i - y_bar)^2 (TODO slide 25)
+* Sum of squares decomposition:
+  * TSS = ESS + RSS
+  * Decomposition of total variation
+  * ANOVA is a similar idea
+  * Q: How to show that your model is more useful than the null model?
+    * A: Compare the ESS to RSS 
+      * If ESS is much higher than RSS, then the model is useful -> you can also just look at the TSS since this value is comprised of ESS and RSS
+* The coefficient of determination: R^2
+  * R^2 = RSS/TSS = 1 - (RSS/TSS) = proportion of total variation that can be explained by the model
+  * Number between 0 and 1
+  * R^2 increases as the number of predictors in the model increases BUT we don't like large models since you will get a large penalty in AIC
+* AIC: Akaike Information Criterion
+  * (goodness of fit) + (penalty for large model or large number of predictors)
+  * Choose a model with small AIC values
+  * BIC is similar
+* Adjusted R^2: usefulness of your model in linear models
+  * Penalized for large number of covariates in the model
+* Residual standard error
+  * Intuitively, a DF is how much free direction you can use
+  * RSE = sqrt((1/(n-p-1)) * RSS)
+  * RSE is the variation in the noise
+* Mean squared error
+* R^2 cannot be used to check if the model is "significantly" better than another model -> you need hypothesis testing in order to measure significance
+* What does significant mean?
+  * In hypothesis testing, significant means that what you observe is unlikely to have occurred due to chance
+* Goodness of fit = how good your model fits the data
+* You can split the variation into different sources -> decomposition
+* You cannot use R^2 for hypothesis testing
+* F-Test: used for testing nested models
+  * Use when one model is larger than the other
+  * Example:
+    * model 1: `y = beta_0 + beta_1*X_1 + e`
+    * model 2: `y = beta_0 + beta_1*X_1 + beta_2*X_2 + e`
+    * Model 1 is nested within model 2
+    * Q: Which model is significantly better?
+      * A: To answer this question, we need to use F-test
+* WE WILL NOT NEED TO CALCULATE THE F-STATISTIC
+* To calculate the F-statistic:
+  * RSS of the reduced model divided by the RSS of the full model
+* Previously, using an F-table was necessary which has df on the x and y axis of the table which indicates the F value of interest
+  * This is not done anymore
+* Should just use the anova() command
+* R^2 is not a test
+  * In order to compare two different models, we must use F-test (using anova) -> tests if one of the predictors can be removed
+* F-Test can only be used to compare nested models, not non-nested models
+  * If the model is not nested, you cannot use F-test to compare these (e.g. if one of the model uses X1 and the other uses X2)
 
 ### Topic 6 Questions:
 * What is the difference between drop1() and step()
