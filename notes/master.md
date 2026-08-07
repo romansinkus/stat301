@@ -440,3 +440,59 @@ m2
 * What is the difference between drop1() and step()
 
 ### Topic 6 TO STUDY:
+
+# Topic 7: Model Evaluation (Goodness of Fit for Logistic and Poisson)
+* A "perfect" model goes through all of the points
+  * This is not useful even though R^2 = 1 -> it is not useful intuitively since you overfit the data
+  * If you get another sample from the same population, the model will likely make many mistakes
+  * This is why we prefer non-perfect models that are considered to be "good"
+* Deviance is composed of very complex mathematical formulas
+* Perfect fit = BAD
+  * "Anything that goes to the extreme becomes bad"
+* Deviance to test
+  * H_0: models I and II are equally good
+  * H_1: one model is better
+  * For GLM, deviance measures the difference of the two log-likelihoods
+  * Deviance ~ X^2(d), where d is the difference of the number of predictors in the two models
+    * The test statistic is the deviance
+    * ~ under H_0
+    * This only works well for large sample. You want an infinite sample size, however in practice this is not possible
+* R^2 cannot be used for logistic regression models
+* F-Test cannot be used for logistic regression models
+* "The most important thing to remember for topic 7":
+  * R^2, adj. R^2, RSE, and MSE ONLY apply for linear regression.
+  * For logistic regression and poisson regression, we use deviance instead
+  * Deviance mathematical formula is ugly, but you can think of Deviance as a generalization of RSS for linear regression
+  * Deviance test allows you to compare models
+
+### Topic 7 Questions
+* What does generalized linear model (glm) mean?
+
+# Topic 8: Regularization Methods for Variable Selection
+* We have already talked about stepwise function
+  * start with null model and add x1 and check the R^2 or AIC, then add x2 and check R^2 or AIC, etc.
+  * The problem with this method is that it depends on which variables are selected first for this process
+  * This results in a model being either kept or left out, however, in real life we also want something in between these two discrete options -> this would be called "smooth"
+* Should split your data into training data and testing data
+  * Training data is used to get your estimate
+  * Testing data is used to check prediction accuracies (y_i - y_i_hat)
+    * From the predictions, you can then calculate your MSE
+  * This process is called cross-validation
+  * You'll likely need to keep updating your training data and therefore updating your estimating
+  * You can split the data in many different ways
+    * Common approach is to split the data in several different ways
+      * e.g. split it in 10 ways = 10-fold cross-validation
+      * Pick the model that is the most accurate out of all these possible models that have been created
+  * Training data simply refers to the data that you use to get your estimate
+* Regularization shrinks coefficients in a continuous way by adding a penalty
+* Regularization techniques:
+  * Ridge: uses an L2 norm to measure the size of the coefficients
+    * We prefer squared rather than abs value since it is smooth and therefore it is differentiable
+  * Lasso: uses an L1 norm to measure the size of the coefficients
+* Lambda is called a penalty parameter -> this controls how much penalty you give to each coefficient
+* We will skip ridge and instead only focus on LASSO
+* LASSO
+  * High dimensionality problem: number of predictors is much larger than the sample size
+  * It is not unbiased
+  * Tradeoff between variance and bias
+* 
