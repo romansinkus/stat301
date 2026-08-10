@@ -397,7 +397,7 @@ m2
     * A: Compare the ESS to RSS 
       * If ESS is much higher than RSS, then the model is useful -> you can also just look at the TSS since this value is comprised of ESS and RSS
 * The coefficient of determination: R^2
-  * R^2 = RSS/TSS = 1 - (RSS/TSS) = proportion of total variation that can be explained by the model
+  * R^2 = ESS/TSS = 1 - (RSS/TSS) = proportion of total variation that can be explained by the model
   * Number between 0 and 1
   * R^2 increases as the number of predictors in the model increases BUT we don't like large models since you will get a large penalty in AIC
 * AIC: Akaike Information Criterion
