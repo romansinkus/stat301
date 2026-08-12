@@ -495,4 +495,55 @@ m2
   * High dimensionality problem: number of predictors is much larger than the sample size
   * It is not unbiased
   * Tradeoff between variance and bias
+* LASSO has been originally used for high dimensionality problem, but now it's used in other cases since it has "good prediction power"
+* LASSO is biased (not unbiased) -> the goal is to minimize the mean squared error
+  * MSE = Var(b_j_hat) + bias^2
+  * Bias variance tradeoff
+* Lambda Selection by CV with LASSO
+  * You want to select the number of predictors associated with a small MSE but while selecting the fewest predictors possible
+  * Lambda is the penalty -> the graph shows how to best choose the best lambda value
+  * You can use R to find the lambda for you
+* 69-95-99.7 rule
+  * 1SD - 2SD - 3SD away from the mean
+* LASSO smoothly selects variables and trains the corresponding model for the values of lambda in the grid -> this differs from stepwise which is instead completely discrete (either 0 or 1 for each of the predictors)
+* LASSO is used to build strong predictive models
+* Using LASSO for interference is biased -> you get a better prediction, but at the price of having a large bias
+* Map function is useful for doing simulation
+* Can we use the data to first estimate the parameters then use the same data for inference?
+  * Probably not, because you're using the data TWICE
+* Parametric vs. non-parametric
+  * Parametric model is easier to interpret
+* Prediction vs. Inference
+  * **inference** is about generalizing your conclusions to the whole population
+  * prediction 
+* Any smooth and differentiable function can be approximated by a taylor polynomial
+* Q: If we use data to select a model, can we fit the selected model using the same data to make inference -> suppose this is the research question. How do we prove it?
+  * (1) Mathematical proof -> It is very difficult to prove mathematically
+    * You often assume that the sample size is infinite which is not a realistic assumption
+  * (2) Can do simulation
+    * R is very slow with simulation
+    * You repeat the same scenario multiple times to quantify error rates
+* Simulation design
+  1. Setting (variables): a response variable Y and a p=10 covariates with Normal Distribution
+  2. Setting (coefficients): set all coeffs to 0, so none of the generated covariates will have an effect on Y
+     * b1=b2=...=b10=0 -> imply that none of the predictors should be selected
+  3. generate 100 observations (n) for this setting
+  4. Apply the forward selection alg to select at most 3 variables among the 10 available, using the adj R^2
+  5. ~~Use the selected model and the same dataset to make inference about the population~~
+  6. Replicate this study 1,000 times and compute the type 1 error rate
+  * The issue with this setup is step 5 since we are using the same dataset to calculate the p-value. All other parts are fine. Since we are repeating this 1,000 times, this cannot be explained by random chance.
+* For loops in R are quite slow -> should use C to do anything computationally demanding
+  * R is mostly for interface
+
+### Topic 8 questions
+* What is LASSO used for now if it's not used for reducing the size of models?
+* Why did we not want small p-values in the simulation experiment?
+
+### Topic 8 TOSTUDY
+* Parametric vs. non-parametric
+* Prediction vs. inference
+* Types of error rates
+
+# Topic 9: Prediction Uncertainty
+* `add1()` and `drop1()` can be used when doing stepwise variable selection
 * 
