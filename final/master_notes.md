@@ -35,18 +35,29 @@
 - `slides/topic7_GoodnessOfFitGLM.pdf` (deviance)
 - `slides/topic8_part1_Regularization.pdf` + `topic8_part2_PostInference.pdf` (Ames Housing)
 - `slides/topic9_PredictionUncertainty.pdf` (Strathcona property tax data)
-- `in-class/activity5–11` + `notes/master.md` (the running personal notes for Topics 4–9)
+- `in-class/activity5–12.ipynb` — wage-data walkthroughs for Topics 3–8 (VIF, logistic, Poisson/CD4, F-test, stepwise, LASSO)
+- `notes/master.md` (the running personal notes for Topics 1–9, incl. open questions resolved below)
 - `worksheets/worksheet_01.ipynb` (SLR estimation, inference & bootstrapping — cancer data)
 - `worksheets/worksheet_02.ipynb` (categorical inputs, additive MLR & interactions — cancer data)
 - `worksheets/worksheet_03.ipynb` — model assumptions & causality, explored by **simulation** (known true params)
+- `worksheets/worksheet_04.ipynb` — **logistic** regression (binary responses)
+- `worksheets/worksheet_05.ipynb` — **Poisson** regression (horseshoe `crabs`: `n_males` count)
+- `worksheets/worksheet_06.ipynb` — goodness of fit & nested models (**protein~mRNA** Nature case study)
+- `worksheets/worksheet_07.ipynb` — goodness of fit beyond MLR: **deviance** for a logistic model (Wisconsin breast-cancer data)
+- `worksheets/worksheet_08.ipynb` — **regularization (LASSO/ridge) & post-inference** via two simulations
 - `tutorials/tutorial_01.ipynb` — generative modelling, EDA, SLR estimation/inference/bootstrap (CASchools data)
 - `tutorials/tutorial_02.ipynb` — MLR with categorical inputs & interactions (CASchools: `read ~ income * grades`)
+- `tutorials/tutorial_04.ipynb` — **logistic** regression (`Default` credit-card data; odds ratios)
+- `tutorials/tutorial_05.ipynb` — **Poisson** regression (`galapagos` plant-species counts)
+- `tutorials/tutorial_06.ipynb` — goodness of fit & nested models (**protein~mRNA**, models 1–5)
+- `tutorials/tutorial_07.ipynb` — **stepwise selection in MLR** (`regsubsets`/`stepAIC`, test RMSE — Ames housing + used cars)
 - `in-class/activity1.ipynb` + `STAT301_activity1.pdf` — SLR estimation & correlation (wage data, Jul 7)
 - `in-class/activity2.ipynb` + `STAT301_activity2.pdf` — SLR inference: significance, CI, z/p (wage data, Jul 9)
 - `in-class/activity3.ipynb` + `STAT301_activity3.pdf` — additive MLR, `factor()` dummies & **ANOVA** (wage data, Jul 14)
 - `in-class/activity4.ipynb` + `STAT301_activity4.pdf` — interactions & LINE diagnostics + `log()` fix (wage data, Jul 16)
 - `midterm/review-slides.pdf` — the **Jul 21 review deck** (recaps the whole course as one MLR framework)
-- `midterm/mt-info.md` — official exam logistics
+- `slides/final-review.pdf` — the **final review deck** (post-midterm recap + confirmed final logistics)
+- `midterm/mt-info.md` — official midterm exam logistics
 
 *(Tutorial 03's confounding simulation is referenced in the Causality section, as summarized from the Topic 3 designs deck. The four in-class activities all use the **`wage.txt`** dataset — `wage ~ education`, later adding `sex` and `occupation` — and are walked through in their own section below.)*
 
@@ -58,18 +69,21 @@
 
 # EXAM LOGISTICS & WHAT'S TESTED
 
-> **Note for the FINAL.** The logistics below (date/room) were for the **midterm**. The **final is
-> cumulative** — it can test **Topics 1–9**. The *format and marking philosophy* described here
-> (written answers, interpret R output, show your steps, one allowed sheet, bring a calculator) is
-> the course's standing style, so it's the best guide we have for the final too. Check Canvas for the
-> final's actual date/room. **What changes for the final:** you now also need to interpret **`glm`
-> output** (logistic & Poisson), **deviance / AIC**, **`R²` and `anova` F-tests**, **LASSO paths &
-> cross-validation plots**, and **prediction vs confidence intervals** — see Topics 4–9 below.
+> **Confirmed from the final review deck (`slides/final-review.pdf`).** The final is **cumulative —
+> it covers all term material (Topics 1–9)**, but with **more weight on the post-midterm material**
+> (logistic, Poisson, diagnostics/evaluation, variable selection, post-inference, prediction
+> uncertainty). The review deck itself **only covers the post-midterm topics** — you are expected to
+> **review the pre-midterm material (Topics 1–3) on your own**. **What's new to interpret vs. the
+> midterm:** **`glm` output** (logistic & Poisson), **deviance / AIC / BIC**, **`R²` / adjusted `R²` /
+> RSE / MSE and `anova` F-tests**, the **χ² deviance test**, **LASSO paths & cross-validation**, and
+> **prediction vs confidence intervals** — see Topics 4–9 below.
 
-**When/where (midterm):** Thursday **July 23, 2026, 3:45–4:45pm (60 minutes)**, in person, **ESB1012**. Hard
-copies handed out; then 15 min (until 5:00pm) to upload a **single PDF** to Canvas
-(filename `LastName-FirstName.pdf`). Also hand in the hard copy. Covers everything **up to and
-including the Tuesday July 21 review class.**
+**When/where (FINAL — confirmed):** **Wednesday, August 19, 2026, 3:30–5:40pm (130 minutes)**, in
+person, **Life Building 2302**. Hard copies are distributed; you then have up to **20 minutes
+(5:40–6:00pm)** to upload your solutions as a **single PDF** to the Canvas **"Assignment"** section
+("**Final Exam Solutions upload here**" link). You may either **write on the exam paper and scan it**,
+or **write on your laptop and upload**. **Picture ID will be checked.** You may access Canvas/Internet
+**only at the end**, for uploading.
 
 **Format — read this carefully:**
 
@@ -78,21 +92,28 @@ including the Tuesday July 21 review class.**
 - The exam tests **understanding of the basics + critical thinking**, *not* tedious computation or
   heavy math. Expect: **interpret an R output**, say **what a model component means**, and **explain a
   concept in the context of the given dataset.**
-- **R code is not directly tested**, but you must understand the R *outputs* shown in class (e.g. a
-  `get_regression_table()` / `lm` summary, an ANOVA table, VIF values, residual & Q-Q plots).
+- **R code is NOT directly tested**, but you **must understand the R *outputs*** shown in class (e.g. a
+  `get_regression_table()` / `lm` / `glm` summary, an ANOVA / deviance table, `glance()` metrics, VIF
+  values, residual & Q-Q plots, a LASSO path / CV plot).
 - **Some simple calculations** — **bring a simple calculator.**
-- **Marking: 70% for correct procedure / key steps, 30% for the correct answer.** ⇒ *Always show your
-  steps*, and **write word-answers clearly** or lose marks.
-- **Closed book/notes**, but you may bring **one letter-size sheet (both sides, written or typed).**
+- **Marking philosophy (standing course style):** show your **procedure / key steps** and **write
+  word-answers clearly** — reasoning is where most marks live.
+- **Closed book/notes**, but you may bring **TWO letter-size sheets (both sides, written or typed)** —
+  *note this is **two** sheets for the final, vs. one for the midterm.*
 
-**Framing tip from the review deck:** the review treats **everything as one Multiple Linear Regression
-framework** — *SLR is just the special case with one predictor (p = 1)*. So master the general
-`Y = b0 + b1*X1 + ... + bp*Xp + e` interpretation and the special cases fall out of it.
+**Framing tip from the review decks:** everything is **one Multiple Linear Regression framework** —
+*SLR is the special case `p = 1`* — and, more broadly, linear/logistic/Poisson are all **one GLM**
+`g(E[Y]) = b0 + b1*X1 + ... + bp*Xp` (the link `g` changes with the response type). Master the general
+interpretation and the special cases fall out of it.
 
-> **One-sheet cheat-sheet candidates** (what's worth putting on your allowed page): the coefficient-
-> interpretation table, the LINE assumptions + their fixes + consequences, the interaction 4-coefficient
-> table, VIF/GVIF thresholds, and the CI ⇔ hypothesis-test ⇔ p-value equivalence. See the
-> [Master Cheat Sheet](#master-cheat-sheet).
+> **Two-sheet cheat-sheet candidates** (you get **two** pages for the final). *Post-midterm (weight
+> them heavily):* the **GLM coefficient table** (log-odds/odds/rate-ratio, the 3 scales), the
+> **overdispersion** check (`quasi*`, η vs. 1), **deviance / χ² test** vs. **F-test**,
+> **R²/adjR²/RSE/MSE** definitions, **LASSO** (λ, CV, bias → post-LASSO), the **double-dipping** fix
+> (split the data), and **CIP vs PI**. *Pre-midterm:* the coefficient-interpretation table, LINE
+> assumptions + fixes + consequences, the interaction 4-coefficient table, VIF/GVIF thresholds, and
+> the CI ⇔ test ⇔ p-value equivalence. See the [Master Cheat Sheet](#master-cheat-sheet) and
+> [`blocks-ai.md`](blocks-ai.md).
 
 ---
 
@@ -879,9 +900,30 @@ h( E[Y | X] )  =  b0 + b1*X1 + ... + bp*Xp
   directly, not `Y = ... + e`. (Randomness still exists — it's baked into the Bernoulli/Poisson
   distribution of `Y` — but there's no additive `e` written in the equation.)
 - **Estimation is by Maximum Likelihood (MLE), not Least Squares**, and there is **no closed-form
-  formula** — R runs an **iterative algorithm** ("Fisher Scoring iterations" in the summary). *(For
+  formula** — R runs an **iterative algorithm** ("Fisher Scoring iterations" in the summary), which
+  **may occasionally fail to converge**. *(For
   Normal errors, MLE and LS give the identical answer — that's why `lm` and `glm(family=gaussian)`
   agree.)*
+
+> **Analogy — the link function is a "power adapter."** Your wall socket delivers voltage over a huge
+> range (the linear predictor, `−∞` to `+∞`), but your device only accepts a specific range (a
+> probability in 0–1, or a positive count). The **link `g` is the adapter** that safely converts between
+> the two: the linear predictor can swing anywhere, and the adapter squeezes it back into the legal range
+> for the response. Different devices need different adapters — **logit** for probabilities, **log** for
+> counts, and the **identity** ("no adapter needed") for an ordinary continuous response.
+
+> **Cleared-up confusions (from the personal notes).**
+> - **"What does GLM even mean?"** *Generalized* Linear Model — it **generalizes** ordinary linear
+>   regression in two ways: (1) the response can follow a **non-Normal** distribution (Bernoulli, Poisson,
+>   …), and (2) we model a **link `g` of the mean** rather than the mean directly. Plain linear
+>   regression is the special case (Normal response, identity link). "Linear" survives because the
+>   right-hand side `b0 + b1x1 + …` is still linear.
+> - **"Why do we 'drop the `e`' when predicting?"** In a *linear* model `Y = b0 + b1x + e`, the best
+>   prediction aims at the **average** `E[Y|X]`, and the error `e` has mean 0 — so its best guess is 0 and
+>   it drops out, leaving `ŷ = b̂0 + b̂1x`. In a **GLM there's no `e` to drop in the first place**: we model
+>   a function of the average directly, so the equation never had an additive error term.
+> - **"MLE?"** **Maximum Likelihood Estimation** — pick the coefficients that make the **observed data
+>   most probable** under the assumed distribution. (For Normal errors this coincides with least squares.)
 
 ---
 
@@ -1004,15 +1046,40 @@ An estimated logistic model predicts on **whichever scale you ask for**:
 
 ## Overdispersion (the key logistic/Poisson diagnostic)
 
-The model **assumes** the variance equals the Bernoulli value `p(1−p)`. **Overdispersion** = the data's
-actual variability is **larger than the model assumes**. This **misspecifies the SEs (not the point
-estimates)** → CIs and p-values become unreliable.
+The model **assumes** the variance equals the Bernoulli value `p(1−p)` (i.e. `Var(Y) = E(Y)(1−E(Y))`).
+**Overdispersion** = the data's actual variability is **larger than the model assumes**
+(`Var(Y) > E(Y)(1−E(Y))`). This **misspecifies the SEs (not the point estimates)** → CIs and p-values
+become unreliable.
 
-- **Detect:** refit with `family = quasibinomial` and read the **dispersion parameter**. If the model is
-  correctly specified it's ≈ **1**; **> 1 = over-dispersion, < 1 = under-dispersion**. (Titanic:
-  dispersion ≈ **0.98** ⇒ no sign of overdispersion.)
+- **The dispersion parameter η (final-review framing).** Introduce a factor **η** and model
+  `Var(Y) = η·E(Y)(1−E(Y))`. If the assumed Bernoulli/Binomial distribution **holds, η = 1**; **η > 1 =
+  over-dispersion, η < 1 = under-dispersion**. (When η ≠ 1, `Y` is no longer strictly Bernoulli/Binomial.)
+- **Detect:** refit with `family = quasibinomial` to **estimate η** and read the **dispersion
+  parameter**. If it's **far from 1, use the `quasibinomial` results** instead of the plain `binomial`
+  ones. (Titanic: dispersion ≈ **0.98** ⇒ no sign of overdispersion.)
 - **Fix:** the **quasi-likelihood** approach (`quasibinomial`) estimates the dispersion and **corrects
   the standard errors**; the coefficient estimates are unchanged.
+
+> **Cleared-up confusions (from the personal notes).**
+> - **"Why don't we just model the probability directly — isn't that the most useful thing?"** Two
+>   reasons. (1) **Range:** a probability is trapped in (0,1), but a straight line isn't — it would predict
+>   nonsense like −0.3 or 1.4. (2) **Constant effect:** on the probability scale the effect of `X` isn't
+>   constant (the S-curve is flat near 0 and 1, steep in the middle), so a single slope can't describe it.
+>   The **log-odds** scale is unbounded *and* makes the effect a constant slope — the scale where a
+>   *linear* model actually fits. We still **report probabilities for prediction** (just convert back with
+>   `p = e^L/(1+e^L)`); we simply don't *model* on that scale. **Analogy:** the logit "unrolls" the
+>   bounded probability into a straight, evenly-spaced ruler where one extra unit of `X` always means the
+>   same step.
+> - **"Additive or interaction? Some slides *add*, others *multiply* — which is it?"** Both, on different
+>   scales. On the **log-odds** scale the model is **additive** (exactly like MLR: `b0 + b1x1 + b2x2 +
+>   …`). When you **exponentiate** to the **odds** scale, addition becomes **multiplication**, because
+>   `e^(a+b) = e^a·e^b`. So the *same* model looks additive in log-odds and multiplicative in odds — that's
+>   why you see both. ("Interaction" is a separate idea: a product *term* `x1·x2` in the linear part.)
+> - **"Why can't I use a Q-Q / residual plot for logistic like I did for linear regression?"** Those
+>   plots assume **Normal errors with constant variance**. A logistic response is **0 or 1**, so (a) its
+>   variance `p(1−p)` **changes** with the fitted probability (not constant), and (b) the raw residuals
+>   collapse onto **two lines** (`−p̂` and `1−p̂`). There simply isn't a Normal, constant-variance error to
+>   check — so the plots are uninformative, and we lean on **overdispersion** instead.
 
 ---
 
@@ -1081,6 +1148,9 @@ residuals (`r_pearson = (y − λ_hat)/sqrt(λ_hat)`), residual plots not very u
 
 - **Poisson regression *usually exhibits overdispersion*** because the "mean = variance" straitjacket is
   rarely true in real data. **This is a much bigger deal for Poisson than for logistic.**
+- **The η framing (final review).** Under Poisson, `Var(Y) = E(Y) = e^(b0+b1x1+…)`. If the observed
+  variance exceeds this, model `Var(Y) = η·E(Y)` with **η > 1** ⇒ over-dispersion; use `quasipoisson`
+  for inference.
 - **Detect:** refit with `family = quasipoisson` and check the **dispersion parameter** (want ≈ 1).
   Bikeshare: **dispersion ≈ 90.6** — *wildly* above 1 ⇒ **severe overdispersion**, the Poisson
   assumption clearly fails. *(Contrast the Titanic logistic dispersion of ≈ 0.98 — that's what "fine"
@@ -1093,6 +1163,21 @@ residuals (`r_pearson = (y − λ_hat)/sqrt(λ_hat)`), residual plots not very u
 > overdispersion *sometimes*. Poisson → **log-mean / mean** (rate ratios), variance `= λ`,
 > overdispersion *usually*. Both: no error term, MLE, Wald inference, `factor()` your categoricals,
 > exponentiate for a multiplicative interpretation.
+
+> **Cleared-up confusions (from the personal notes).**
+> - **"Why is a dispersion parameter of *1* the magic number?"** Because the Poisson distribution
+>   *assumes* **mean = variance** exactly, so its **built-in (theoretical) dispersion is 1** — that's the
+>   baseline the model promises. The dispersion parameter η is really the **ratio `actual variance ÷
+>   assumed variance`**: **η = 1 means reality matches the assumption**, η > 1 means the data are more
+>   spread out than Poisson allows (over-dispersion), η < 1 less. It's a **reality-check ratio**, and 1 is
+>   "reality agrees with the model." (Same logic for logistic, where the assumed variance is `p(1−p)`.)
+> - **"Why did the slides fit *separate models for leisure vs. working days*?"** That's an
+>   **interaction** between `temp` and `workingday`: it lets the temperature effect **differ** by day type
+>   (warm weather boosts leisure riding more than commuting). Fitting "two models" is just a vivid way to
+>   picture one interaction model with **different slopes** per group — exactly the cat×continuous
+>   interaction idea from Topic 2, now on the log-mean scale.
+> - **"Why drop the `e` again?"** Same answer as the GLM bridge: a Poisson model has **no additive error
+>   term** — we model `log(E[Y|X])` directly, so there's no `e` to write or drop.
 
 ---
 
@@ -1229,6 +1314,25 @@ model_full)`** compares **any** nested pair (protein example: adding `gene` to `
 > the data twice and the inference is **no longer valid** (the **post-inference / "double-dipping"
 > problem**).
 
+> **Analogy — `R²` vs. adjusted `R²`.** Think of `R²` as a **student who gets extra credit for every
+> assignment they *attempt*, whether or not they do it well** — so their score only ever goes up as they
+> pile on more work (more predictors). **Adjusted `R²`** is a stricter grader who **deducts points for
+> busywork**: a predictor has to actually improve the fit *enough to justify the degree of freedom it
+> costs*, or the adjusted score drops. That's why you compare models of different sizes with **adjusted
+> `R²`, never raw `R²`.**
+
+> **R helpers for variable selection (from the personal notes — `step`, `drop1`, `add1`).** These
+> automate the "which variables?" search using **AIC**:
+> - **`drop1(model)`** — a **one-move what-if table**: from the *current* model, it shows the AIC (and a
+>   test) for **removing each single variable**, one at a time. `add1(model, scope)` is the mirror image —
+>   the effect of **adding** each candidate. Think "what happens if I take out (or put in) *one* player?"
+> - **`step(model)`** — runs the **whole automated search to the end**: it repeatedly applies the `drop1`
+>   / `add1` logic (forward, backward, or both), each time making the single best AIC move, until no move
+>   improves AIC. Think "run the entire tryout process, not just one swap." So `drop1`/`add1` are the
+>   **single steps**; `step` is the **full loop**. **Both work on `lm` *and* `glm`.** (Caveat: like all
+>   selection, `step` optimizes AIC — it doesn't *know* which variables are truly important, and its
+>   p-values afterward suffer the double-dipping problem.)
+
 ---
 
 # TOPIC 7 — GOODNESS OF FIT FOR GLMs
@@ -1273,6 +1377,14 @@ test statistic = difference in deviance  ~  χ²(d)     under H0
 > **Cheat-sheet mapping.** Linear model: **RSS → R²/adjR², F-test**. GLM (logistic/Poisson): **deviance
 > → deviance χ²-test** (and **AIC**, which works for *both* since it's likelihood-based). If a question
 > gives you a `glm` and asks about `R²`, the answer is "**you can't — use deviance.**"
+
+> **Analogy — deviance is a "golf score."** It measures **how far your model is from a perfect (saturated)
+> round** — so **lower is better**, and 0 would be a hole-in-one on every hole (the saturated model that
+> hits every data point). Adding useful predictors *lowers your score* (residual deviance drops from the
+> null deviance). But a **literal zero is bad news**, not bragging rights: it means you memorized the
+> course (overfit) and will play terribly on a new one. The **deviance test** just asks whether a bigger
+> model's lower score is a **real** improvement or within normal round-to-round noise (χ²). Don't confuse
+> **deviance** (fit, lower = better) with **dispersion** (the variance reality-check from Topics 4–5).
 
 ---
 
@@ -1349,7 +1461,8 @@ data inflated `adj R²`, which then fooled the test.*
 
 **The fix — split the data:** use **one part to select** the model and a **separate part to fit and test**
 it. Because the inference part never saw the selection, its Type I error is **controlled** (back to ~5%).
-The course verifies this with the same simulation on split data.
+The course verifies this with the same simulation on split data. *(The final-review deck frames this as
+**the same idea behind cross-validation** — hold out data the model-building step never touched.)*
 
 - **postLASSO (bridges to Topic 9):** LASSO's coefficients are *biased*. But if you take the variables
   **LASSO selected** and refit **ordinary LS on just those variables**, that **postLASSO** estimator is
@@ -1358,6 +1471,29 @@ The course verifies this with the same simulation on split data.
 - **Takeaway:** you **cannot select variables and do valid inference on the same data**. Split it, or use
   more advanced methods (beyond this course). *(R tooling for the worksheets: `map`/`map_dbl`/`map2`
   apply a function across a list of datasets; `update()` refits a model with a tweaked formula.)*
+
+> **`k`-fold cross-validation (how `cv.glmnet` really picks λ).** Instead of one train/test split, CV
+> **rotates**: chop the training data into `k` equal parts ("folds"), then `k` times train on `k−1` folds
+> and measure error on the held-out fold, so **every observation gets used for testing exactly once**.
+> Average the `k` error estimates for each candidate λ and pick the λ with the smallest average (or the
+> `lambda.1se` simpler choice). **Analogy:** rather than judging a chef on one dish, you have them cook for
+> `k` different tasting panels and average the reviews — a more stable verdict. `k = 10` (10-fold) is the
+> usual default.
+
+> **Cleared-up confusions (from the personal notes).**
+> - **"If LASSO isn't mainly for shrinking model size, what *is* it for now?"** Its headline use today is
+>   building **strong *predictive* models** — the shrinkage trades a little bias for a big variance
+>   reduction (`MSE = Var + Bias²`), which improves out-of-sample prediction. It's *also* still great for
+>   **high-dimensional** problems (`p >> n`, more predictors than observations) where ordinary least
+>   squares breaks down, and it conveniently **selects variables** as a side effect (coefficients hit
+>   exactly 0). What it's *not* good for is **unbiased inference** — for that you need postLASSO + a data
+>   split.
+> - **"Why was getting *small p-values* a *bad* thing in the double-dipping simulation?"** Because in that
+>   simulation the truth was rigged so that **no variable matters** (every true coefficient is 0), i.e.
+>   **`H0` is actually true.** A correctly behaving test should then reject only about **5%** of the time.
+>   Getting small p-values (rejecting) far more often means the test is **crying "significant!" on pure
+>   noise** — **false positives / inflated Type I error** — which is exactly the bug the simulation was
+>   built to expose. Small p-values are only "good" when there's a real effect; here there isn't.
 
 ---
 
@@ -1418,14 +1554,23 @@ wider. Predicting **one actual value is harder** (more uncertain) than predictin
 > the **CIP band** (uncertainty of the *fitted line/average*) — **not** a PI, and **not** the scatter of
 > the points. This is the same "SE of the line ≠ scatter of the points" idea from Topic 1 inference.
 
+> **Analogy — bus arrival times.** The **CIP** is like predicting the **average** arrival time of the
+> 8:05 bus over all weekdays — with lots of data you can pin the *average* down quite tightly (a **narrow**
+> interval). The **PI** is like predicting when **tomorrow's specific bus** will arrive — even if you knew
+> the true average perfectly, *this one bus* still varies with traffic and weather (its own error `e`), so
+> your interval must be **wider**. Same best guess (`ŷ`), but "the average bus" is far easier to predict
+> than "tomorrow's bus." That extra `e` is exactly why **PI ⊃ CIP, always.**
+
 ---
 
 # WORKSHEET PRACTICE — R CODE & EXTRA NUGGETS
 
-The two worksheets use the **`US_cancer_data`** dataset (`TARGET_deathRate` = cancer deaths per 100 000;
-`povertyPercent`; `PctPrivateCoverage`; `state`). They are where the theory above becomes runnable R code.
-Below is everything the worksheets add or reinforce — **great exam-prep material because it's exactly the
-style of question you'll be asked.**
+The **Topic 1–3 worksheets** use the **`US_cancer_data`** dataset (`TARGET_deathRate` = cancer deaths per
+100 000; `povertyPercent`; `PctPrivateCoverage`; `state`); the **post-midterm worksheets** move to new
+data — **Worksheet 07** (breast-cancer logistic, deviance) and **Worksheet 08** (two model-selection
+simulations). They are where the theory above becomes runnable R code. Below is everything the worksheets
+add or reinforce — **great exam-prep material because it's exactly the style of question you'll be
+asked.**
 
 ## Worksheet 01 — SLR: estimation, inference, bootstrapping
 
@@ -1640,15 +1785,121 @@ the [Causality section](#topic-3--causality--study-designs) (the ad / `athlete` 
 it states outright: **the goal of generative modelling is usually a causal claim, but with
 observational data we usually can't make one** — confounders block it.
 
+## Worksheet 04 — binary responses (logistic regression) → *Topic 4*
+
+Worksheet 04 is the **logistic-regression lab**. It opens by motivating *why* MLR fails for a
+**dichotomous** response (yes/no, success/failure, sick/not-sick) and frames logistic regression as
+doing the same two jobs as linear regression — **inference** (test the true relationship) and
+**prediction** (a probability, i.e. a **classifier**). Concrete examples it lists: drug vs. placebo
+(bacteria present/not), **loan default**, and admission from GPA/ACT.
+
+- **The whole point in one line:** for a 0/1 response, `E[Y|X] = P(Y=1|X)` is a **probability**, so a
+  straight line would predict impossible values outside (0,1) — the **range problem**. We instead model
+  a *function* of that probability, the **logit** `log(p/(1−p))`, with the linear predictor.
+- **Reading the R output:** `glm(y ~ x, family = binomial)`; the raw coefficient is on the **log-odds**
+  scale, `exp(coef)` is the **odds ratio**. The worksheet has you interpret both, and warns against the
+  classic mistake of reading a log-odds coefficient as if it were a probability.
+- **Prediction by hand** (a likely exam task): compute the linear predictor `L = b̂0 + b̂1x`, then
+  `p = e^L/(1+e^L)`. As a **classifier** you'd threshold at 0.5.
+- Everything ties back to the concept section: [Topic 4 — Logistic](#topic-4--logistic-regression).
+
+## Worksheet 05 — discrete count responses (Poisson) → *Topic 5* (horseshoe `crabs`)
+
+Worksheet 05 is the **Poisson lab**, on the **`crabs`** dataset (`faraway`): **173 horseshoe crabs**,
+response **`n_males`** = the count of satellite males around a female's nest, with inputs `color`
+(4-level factor), `spine` (3-level factor), carapace `width` (cm), and `weight` (g).
+
+- **Why Poisson, not MLR:** `n_males` is a **count** (non-negative integer) — a line would predict
+  negative counts (range problem), and the Poisson **mean = variance** property breaks constant variance.
+- **Workflow:** start with an EDA scatter of `n_males` vs. `width` (even though a straight line isn't the
+  model), fit `glm(n_males ~ ., family = poisson)`, and interpret `exp(coef)` as a **rate ratio** (the
+  multiplicative change in the *mean count*). Remember to **`as.factor()`** `color`/`spine` so R makes
+  dummies instead of treating the level codes as numbers.
+- Diagnostics: Pearson residuals + the **overdispersion** check (`quasipoisson`), since count data
+  usually over-disperses. Concept section: [Topic 5 — Poisson](#topic-5--poisson-regression).
+
+## Worksheet 06 — goodness of fit & nested models (protein vs mRNA) → *Topic 6*
+
+Worksheet 06 is the **goodness-of-fit lab** and the **origin of the protein~mRNA case study** used
+throughout Topic 6. It's a real published controversy: a 2014 *Nature* paper (Wilhelm et al.) claimed
+mRNA predicts protein well; a 2017 reanalysis (Fortelny et al.) showed the data **don't** support that
+(protein and mRNA are only weakly correlated). You re-analyze their data with course tools.
+
+- **What it drills:** `R²` as "proportion of variation explained," **why `R²` alone is misleading**
+  (always rises with more predictors; not a test), **adjusted `R²`** to compare sizes, and the
+  **F-test** (`anova`) to ask whether adding a predictor is *significant*.
+- **The punchline** (carried into the lectures): the model can look "significant" because of **`gene`**,
+  not `mRNA` — **a significant model ≠ mRNA predicts protein**. It's the cautionary tale for confusing
+  significance, prediction, and a specific predictor mattering. Concept section:
+  [Topic 6 — Goodness of Fit](#topic-6--goodness-of-fit).
+
+## Worksheet 07 — goodness of fit beyond MLR (deviance for a logistic model) → *Topic 7*
+
+Worksheet 07 evaluates a **logistic** model on the **Wisconsin Diagnostic Breast Cancer** data
+(`breast_cancer`; binary `target` = **malignant = 1 / benign = 0**, 16 continuous inputs, train/test
+split). It's the **deviance-in-R workflow** made concrete:
+
+- **Recode the response** to 0/1 (`if_else(target == "malignant", 1, 0)`), then fit
+  `glm(target ~ ., family = binomial)` (exclude the `ID` column).
+- **Residual types:** `augment()` returns **deviance** residuals by default; `residuals(model, type = ...)`
+  gives **`"response"`, `"pearson"`, `"deviance"`** — the worksheet builds all three side by side (recall
+  raw residual plots are near-useless here; Pearson/deviance are the right ones).
+- **Residual deviance = "RSS for GLMs".** You compute it from the deviance residuals
+  (`sum(deviance_resid²)`) and verify it equals **`model$deviance`**. `glance()` reports both the
+  **`null.deviance`** (intercept-only) and the **`deviance`** (residual, your model); `model$null.deviance`
+  matches `glance`'s null.
+- **Why the null model's null deviance = its residual deviance (Q1.5):** for the intercept-only model
+  *there are no predictors to add*, so the "model being fit" **is** the null model — the two deviances
+  refer to the same fit, hence they're equal.
+- **Deviance χ² test:** `anova(model_null, breast_cancer_model, test = "Chisq")` tests the full additive
+  model vs. intercept-only → **reject H0**, the full model is significantly better (answer **B**: "reject;
+  the full model is significantly better"). The `Resid. Dev` column holds the **residual deviances of the
+  two models** (Q1.7 **true**).
+- **Any nested pair:** compare the full model to a **reduced** 4-variable model
+  (`mean_fractal_dimension + mean_smoothness + mean_compactness + mean_concavity`) with `anova(..., test =
+  "Chisq")`. At α = 0.01 you **reject** → the extra variables *are* jointly relevant (answer **A**). Note
+  a reduced model can fit well **even though some of its variables weren't individually significant** in
+  the full model.
+- **Same workflow for Poisson** — just swap `family = poisson`.
+
+## Worksheet 08 — regularization & post-inference (two simulations) → *Topic 8*
+
+Worksheet 08 is the **model-selection lab**, built on **two simulation studies** so the true model is
+known. Uses `glmnet` (LASSO/ridge), `leaps`/`regsubsets` (forward selection), and the
+`map`/`nest`/`map_dbl`/`map2` toolkit to run **1000 datasets at once**.
+
+- **Part I — LASSO is biased.** True model `E[Y|X] = 75·X1 − 5·X2 + 0·X3` (so **β₃ = 0**; X3 irrelevant),
+  `n = 1000`, `rep = 1000`, LASSO at a **fixed λ = 30** via `glmnet(x, y, alpha = 1, lambda = 30)`
+  (**`alpha = 1` = LASSO**, `alpha = 0` = ridge). Pull each β̂₁ with `coef(.x)[2, ]` and plot its
+  **sampling distribution** against the true 75 → it's **NOT centred at 75** (shrunk toward 0), so the
+  LASSO estimator is **biased** (Q1.3 = **false**). The `.` in `coef()` output = a coefficient shrunk to
+  **exactly 0** (variable dropped).
+- **Post-LASSO fix:** use LASSO only to **select** variables, then **re-fit with `lm`** on the selected
+  covariates. That `ls_beta1` sampling distribution **is** centred at 75 — bias removed. (Bias is `E[β̂] ≠
+  β`; an estimator whose sampling distribution isn't centred on the truth.)
+- **Part II — double-dipping.** New sim: `Y` + `p = 10` predictors, **none related to Y** (intercept-only
+  is truly correct), `n = 100`, `rep = 1000`. On each dataset **forward-select ≤ 3 variables by adjusted
+  R²** (`regsubsets(..., nvmax = 3, method = "forward")`), then **F-test** the selected model vs.
+  intercept-only. `H0`: **all selected coefficients = 0** (Q2.2 = **B**). Nominal Type I error = **0.05**
+  (Q2.4), but the **observed** proportion of `p < 0.05` comes out **much higher** (Q2.5) — selecting the
+  best-looking variables *in that sample* then testing on it inflates Type I error.
+- **Part III — data-splitting fix.** Split each dataset **50/50**: select on the first half, do inference
+  (via `update(model, data = tail(50))`) on the second. The p-values from the **selection** half stay
+  **inflated** (Q3.1); the p-values from the **held-out** half return to **≈ 0.05** (Q3.2) — so splitting
+  fixes it (Q3.3 = **true**). The **same problem afflicts LASSO**, fixed the same way (split, or postLASSO
+  **with** a split). Full theory in [Topic 8 Part 2](#part-2--the-post-inference-problem-double-dipping).
+
 ---
 
 # IN-CLASS ACTIVITIES — WAGE DATASET WALKTHROUGH
 
-All four in-class activities run on **`in-class/data/wage.txt`** (`read.table(..., header = TRUE)`;
-columns include `wage`, `education`, `sex`, `occupation`). They march through the whole course arc on
-**one dataset** — SLR → inference → additive MLR/ANOVA → interactions/diagnostics — so they're the most
-faithful preview of exam-style questions. Each activity's coefficient table is read with
-`moderndive::get_regression_table()`.
+The in-class activities run mostly on **`in-class/data/wage.txt`** (`read.table(..., header = TRUE)`;
+columns include `wage`, `education`, `sex`, `experience`, `age`, `union`, `race`, `occupation`, `sector`,
+`marr`, `south`). They march through the **whole course arc on one dataset** — SLR → inference → additive
+MLR/ANOVA → interactions/diagnostics (Activities 1–4), then **multicollinearity → logistic → Poisson →
+goodness-of-fit → stepwise → LASSO** (Activities 5–12) — so they're the most faithful preview of
+exam-style questions. (Activity 9 detours to a Poisson **CD4-count** medical dataset.) Coefficient tables
+are read with `moderndive::get_regression_table()` (linear) or `summary()`/`tidy()` (GLMs).
 
 ## Activity 1 (Jul 7) — SLR estimation & correlation → *Topic 1 SLR*
 
@@ -1707,6 +1958,91 @@ Same `lm(wage ~ education)`, now interrogating uncertainty.
   - **Fix:** refit with a **log-transformed response** `lm(log(wage) ~ education + factor(occupation) + sex)`.
     The residual plot now has **constant spread** and the Q-Q plot **hugs the diagonal** — the classic
     `log(Y)` variance-stabilizing fix from Topic 3.
+
+> **Activities 5–12 continue on the same `wage` data** (with one Poisson detour) and march through the
+> **post-midterm** topics. They're your own worked answers — great "here's the exact style of the exam
+> question" review.
+
+## Activity 5 (Jul 21) — multicollinearity & VIF → *Topic 3* (wage)
+
+Diagnosing collinearity among the wage predictors before trusting any coefficients.
+
+- **(A) Detect:** pairwise correlations show **`age` & `experience` almost perfectly correlated
+  (r ≈ 0.978)** (and a weak `experience`–`education` link, −0.35). Then **VIF/GVIF** on the model flags
+  **`experience`** with a huge (G)VIF — well above the `√5` and `5` thresholds — while `education` and
+  `age` sit below them.
+- **(B) Fix:** **drop `experience`** (the collinear continuous variable). After removing it, **all GVIFs
+  fall below `√5`** ≈ 2.23.
+- **(C) Causation:** this is **observational** data (the traits already exist; nothing was randomly
+  assigned — and randomizing someone's education/sex would be impossible/unethical), so **no causal
+  claim** — association only. Concept: [Multicollinearity](#topic-3--multicollinearity).
+
+## Activity 6 (Jul 23) — logistic regression, one predictor → *Topic 4* (wage)
+
+Here the response is turned **binary**: is a person's wage **above/below average**?
+`glm(above_avg ~ education, family = binomial)`.
+
+- `education` is highly significant (**p ≈ 1.86e-13**). The estimate **0.3017** is on the **log-odds**
+  scale; exponentiating, `e^0.3017 ≈ 1.35`, so **each extra year of education multiplies the odds of
+  an above-average wage by ~1.35 → a ~35% increase in the odds.** A clean demonstration of the odds-ratio
+  interpretation. Concept: [Topic 4 — coefficients](#interpreting-coefficients--three-scales-this-is-the-whole-exam).
+
+## Activity 7 — logistic with two predictors + prediction → *Topic 4* (wage)
+
+`glm(above_avg ~ education + sex, family = binomial)` (**coding: 0 = male, 1 = female**).
+
+- **(A)** Both significant: `education` p ≈ 1.41e-13, `sex` p ≈ 2.89e-05. More education → higher odds of
+  above-average wage (`+0.309`); **being female is associated with lower odds** (`sexfemale = −0.815`),
+  equivalently males have higher odds.
+- **(B) Prediction:** for a **female with 16 years of education**, plug into `p = e^L/(1+e^L)` →
+  **≈ 49.6%** probability of an above-average wage. (This is the by-hand log-odds→probability calc the
+  exam may ask for.) Concept: [prediction scale](#prediction--fitted-values-which-scale--a-favorite-trap).
+
+## Activity 9 (Jul 30) — Poisson regression + overdispersion → *Topic 5* (CD4 counts)
+
+A **Poisson** detour on a medical dataset: modelling **CD4 cell counts** by treatment arm (`trarm`).
+
+- **(A)** `trarm` is highly significant (**p ≈ 2e-16 < 0.05**) → the treatment arm is associated with CD4
+  counts.
+- **(B) Overdispersion:** refit with **`quasipoisson`** → **dispersion ≈ 70.09**, wildly above 1 ⇒
+  **severe overdispersion**, so the plain Poisson SEs/p-values can't be trusted (use the quasi-Poisson
+  fit). A textbook "Poisson usually over-disperses" case. Concept:
+  [Overdispersion](#residuals--overdispersion--poisson-usually-over-disperses).
+
+## Activity 10 (Aug 4) — goodness of fit & the F-test → *Topic 6* (wage)
+
+Comparing two nested linear models of `wage`.
+
+- **(A) Adjusted `R²`:** model 2 (**adds `sex`**) has **adj `R²` = 0.185** vs. model 1's **0.144** —
+  and because it's *adjusted*, the rise isn't just from adding a variable, so model 2 genuinely fits
+  better. (Note: adj `R²` alone doesn't tell you the addition is *significant*.)
+- **(B) F-test (`anova`):** adding `sex` cuts the Sum of Squares by **598.2** with **p ≈ 1.95e-07 < 0.05**
+  ⇒ **reject H0** that `sex` has no effect → model 2 is **significantly** better. The clean pairing of
+  *descriptive* (adj `R²`) with a *test* (F). Concept: [F-test](#part-2--comparing-nested-models-the-f-test).
+
+## Activity 11 (Aug 6) — stepwise selection + deviance test → *Topic 8 / Topic 7* (wage)
+
+- **(A) Backward stepwise** (`step()`, start full → drop one at a time by AIC) keeps **every predictor
+  except `south`**. But **AIC-selected ≠ all significant**: by p-value only `sex, union, race,
+  occupation, sector` are significant; `education, experience, age` were *kept* yet aren't individually
+  significant — and their **identically inflated SEs** hint at leftover **multicollinearity**.
+- **(B) Deviance test** for whether `south` belongs: adding `south` drops the deviance by only **1.84**,
+  **p = 0.174 > 0.05** ⇒ **fail to reject** the smaller model → **not enough evidence to add `south`**.
+  (`H0`: the reduced model suffices.) Concept: [deviance test](#deviance-test--comparing-nested-glms-the-χ²-test).
+
+## Activity 12 (Aug 11) — LASSO vs. stepwise selection → *Topic 8* (wage)
+
+Selecting wage predictors two ways and contrasting them.
+
+- **(A) LASSO** (λ chosen by **cross-validation**) selects **education, south, sex, union, age, race,
+  occupation, sector, marr**.
+- **(B) Backward stepwise** (AIC) selects **education, south, sex, experience, union, occupation** —
+  a **different set** (stepwise drops `age, race, sector, marr` but keeps `experience`, which LASSO
+  dropped).
+- **Why they differ:** **LASSO is smooth** — it shrinks coefficients continuously toward 0 by the λ
+  penalty; **stepwise is binary** — a variable is fully in or fully out, decided greedily by AIC. Two
+  different mechanisms → two different models, and that's expected (there's "no single perfect model").
+  Concept: [Topic 8 — Model Selection](#topic-8--model-selection).
 
 ---
 
@@ -1780,6 +2116,83 @@ Tutorial 03 is the **Topic 3 lab**, in two halves (both on CASchools / a simulat
   estimates — **naive 9.83**, **adjusted 7.92**, **randomized 8.03** (true = 8). See
   [The confounding simulation](#the-confounding-simulation-tutorial-03--with-the-actual-numbers) and the
   **two fixes** (adjust vs. randomize) beside it.
+
+## Tutorial 04 — binary responses (logistic) → *Topic 4* (`Default` credit-card data)
+
+Tutorial 04 is the **logistic lab**, on the **`Default`** dataset from *Introduction to Statistical
+Learning* — **n = 10,000** customers with `default` (Yes/No — the binary response), `student` (Yes/No),
+`balance` (credit-card balance), and `income`.
+
+- **Odds & odds ratios worked cleanly here:** for a binary predictor, `odds_female = e^b0`,
+  `odds_male = e^(b0+b1) = e^b0·e^b1`, so the **odds ratio between groups is `e^b1`** — this tutorial is
+  where the "exponentiated coefficient = odds ratio" identity is made concrete.
+- **Workflow:** `glm(default ~ balance + student + income, family = binomial)`, read log-odds vs. odds,
+  test coefficients with the **Wald z**, and do **model diagnostics** (Pearson/deviance residuals, and
+  the reminder that residual plots are weak → lean on overdispersion).
+- A natural exam-style task from this data: predict the **probability** of default for a customer with a
+  given balance (compute `L`, then `p = e^L/(1+e^L)`). Concept:
+  [Topic 4 — Logistic](#topic-4--logistic-regression).
+
+## Tutorial 05 — count responses (Poisson) → *Topic 5* (`galapagos` species)
+
+Tutorial 05 is the **Poisson lab**, on the **`galapagos`** dataset (`faraway`): **30 Galápagos islands**,
+response = the **number of plant species** on each island, predicted from island characteristics (area,
+elevation, distance to nearest island, etc.).
+
+- Reinforces the **log link** `log(E[Y|X]) = b0 + b1x1 + …` ⇔ `E[Y|X] = e^(…)` (always positive → no
+  range problem), coefficients interpreted as **rate ratios** after exponentiating, Wald inference, and
+  the **overdispersion** check (`quasipoisson`) — counts of species across very different island sizes
+  are a natural over-dispersion setting. Concept: [Topic 5 — Poisson](#topic-5--poisson-regression).
+
+## Tutorial 06 — goodness of fit & nested models → *Topic 6* (protein~mRNA, models 1–5)
+
+Tutorial 06 is the **nested-models lab**, continuing the **protein~mRNA** case study from Worksheet 06 on
+a 3-gene dataset (`dat_3genes`). It lays out **five nested models** and compares them — a perfect map of
+Topic 6's tools:
+
+| Model | Form | What it adds |
+| --- | --- | --- |
+| model.1 | `prot = b0 + e` | null (intercept only) |
+| model.2 | `prot = b0 + b1·mrna + e` | mRNA alone |
+| model.3 | `prot = b0 + b2·gene2 + b3·gene3 + e` | gene dummies only |
+| model.4 | `prot = b0 + b1·mrna + b2·gene2 + b3·gene3 + e` | **additive** |
+| model.5 | model.4 `+ b4·gene2·mrna + b5·gene3·mrna` | **interaction** |
+
+- **`glance()`** gets `R²` and **adjusted `R²`** for each; comparing model.4 vs model.5 shows the key
+  lesson: **model.5 has the larger `R²`** (adding predictors always raises `R²`) but model.4's
+  **adjusted `R²` is essentially as high or higher** — so the extra interaction terms don't earn their
+  keep. Use **adjusted `R²` (not `R²`) to compare different sizes**.
+- **`anova(reduced, full)`** runs the **F-test** for whether a block of terms significantly helps. Concept:
+  [Topic 6 — Goodness of Fit](#topic-6--goodness-of-fit).
+
+## Tutorial 07 — stepwise selection in MLR → *Topic 6 / Topic 8* (Ames housing + used cars)
+
+Tutorial 07 is the **stepwise-selection lab**. It opens by splitting the goal in two — **inference
+(generative)** vs. **prediction** — because *that choice decides which metric you use.*
+
+- **Generative-model metrics (in-sample):** `R²`, **adjusted `R²`** (compare different sizes), in-sample
+  **MSE**, and **nested-model `F`-tests** to select variables.
+- **Predictive-model metrics (out-of-sample — the tutorial's emphasis):** **test MSE** and **test
+  RMSE**, computed on a **held-out test set** — `MSE_test = (1/n_new) Σ(y_new − ŷ_new)²`,
+  `RMSE_test = √MSE_test`. **You must not evaluate on the training data.** You can compute RMSE by hand
+  (`sqrt(mean((y − pred)²))`) or with `yardstick::metrics()` / `rmse()`; the tutorial has you do it
+  **manually** for both the full and a reduced model and compare (interestingly the **full** model won on
+  *this* split — a reminder that a single train/test split is itself noisy).
+- **`regsubsets()` (package `leaps`)** — best-subset / **forward & backward** selection.
+  `regsubsets(y ~ ., data = train, nvmax = p, method = "forward")`; **`nvmax` = the largest model size to
+  search** (set it to the number of predictors so every size 1…p is evaluated — the default is only 8!).
+  `summary(fit)` returns one "best" model per size plus vectors **`$rsq`, `$rss`, `$adjr2`, `$cp` (Mallows'
+  Cp), `$bic`** and the `$which` selection matrix — you pick the best size by **max adjusted `R²`** or **min
+  `Cp` / `BIC`**.
+- **`stepAIC()` (package `MASS`)** — stepwise by information criterion: `direction = "forward" /
+  "backward" / "both"`, with **`k = log(n)` ⇒ BIC** and **`k = 2` ⇒ AIC** (smaller = better).
+- **`regsubsets` vs. `stepAIC` on categoricals (the tutorial's key subtlety):** `regsubsets` evaluates
+  each **dummy column separately**, so it can keep some levels of a factor and drop others (and *which*
+  depends on the arbitrary reference level) — awkward for inference. **`stepAIC` adds/removes a whole
+  categorical variable at once**, which is usually what you want.
+- **Post-selection caveat (stated in the tutorial, bridges to Topic 8):** `summary()` on the selected
+  model gives inference computed on the **same data used to select it** — those p-values/CIs are **not
+  valid** (double-dipping). See [Topic 8 Part 2](#part-2--the-post-inference-problem-double-dipping).
 
 ---
 

@@ -546,4 +546,103 @@ m2
 
 # Topic 9: Prediction Uncertainty
 * `add1()` and `drop1()` can be used when doing stepwise variable selection
+* uncertainty of estimates -> SE(beta_j_hat)
+* Quantify uncertainty using confidence intervals
+* In practice, if you know the population, you don't just take a sample but in practice you won't know the population coefficients
+* y_i_hat = E_hat(y_i|x_i) + e_hat_i has TWO uncertainties
+  1. Expectation
+  2. epsilon
+* Uncertainty means that you have SE's
+* Prediction interval is wider than the usual confidence interval for y_i_hat
+  * TODO -> what does this mean exactly?
+* There are two concepts
+  * Confidence interval: y_i_hat +- 1.96*[SE(y_i_hat)]
+  * Prediction interval: y_i_hat +- 1.96*[SE(y_i_hat) + e_i_hat]
+  * 
+  
+### Topic 9 Questions:
+* How can the fitted value and observed values be different -> the prof mentioned this on slide 25 of the topic 9 slides
+
+# Final Exam Review (Topics 4-9)
+* Materials covered after the midterm:
+  * Logistic regression models
+  * Poisson regression models
+  * Model diagnostics and evaluation
+  * Variable selection methods
+  * Post Inference, Prediction Uncertainty
+* Regression models are most commonly used in practice
+  * Finding the relationship between Y and other variables (called predictors = covariates = inputs = independent variables)
+  * Variable of interest, called the response/dependent variable
+  * "All models are wrong, but some models are useful"
+    * They are wrong because there is a `epsilon` term
+  * In the real world, it's impossible to have a relationship that's truly linear, therefore you need some model diagnostics
+  * "Models should be simple" -> don't make it too complicated (but then again, not too simple)
+* Logistic regression models are used to predict a binary response, but can be written in three equivalent ways
+  * log-odds
+  * odds
+  * probability
+* There are no "tests" available for independence; instead, you need to use judgement for this
+  * e.g. if two students sit next to each other during lecture, their homework scores may not be independent from one another
+* Sometimes the model may not converge -> this is because it is an iterative algorithm
+* For logistic regression, you don't look at the residual plot (residual plot is only useful for linear regression); instead, over and underdispersion are observed
+* In logistic regression, if the dispersion param is far from 1, then you should use quasibinomial instead of binomial
+* Logit function:
+  * f(y) = log(y/(1-y))
+* Poisson distribution assumes...
+  * the response Y is the count
+  * The response y follows a poisson distribution
+  * The response data y_1, y_2, ..., y_n are indep
+* With poisson regression, you will almost always have overdispersion or underdispersion
+* **Link function**: you link the mean of a response `E(Y)` to the linear predictor `L`
+  * If it's linear, then the link function is g(y) = y
+  * For log reg, you have logit link
+  * For poisson, g(y) = log(y)
+  * Link function should be monotone and smooth -> there are many, not just the three noted above
+* A **decomposition of variations** allows us to measure where the variation comes from
+  * TSS = ESS + RSS
+* **R^2** indicates the usefulness of the model
+  * R^2 = ESS / TSS = 1 - (RSS/TSS)
+  * Models with large R^2 values are preferred
+* AIC is another model selection criteria
+  * cannot tell the significance of the model
+  * R^2 and AIC cannot tell if two models are significantly different
+* With R^2 and AIC, you can compare two different models that are not nested, however if you want to look at statistical significance then you have to be comparing nested model
+  * This is one of the advantages of using these values
+  * If you want to show significance, you have to perform an F-test/X^2 test
+* Models should be simple, however, you should not sacrifice goodness of fit
+* Adjusted R^2 simply adjusts for the number of predictors in the model
+* MSE looks at the fitted value and the observed value; it looks at how far away these two values are from one another
+  * MSE is often used in cross-validation
+* Adjusted R^2, RSE, and MSE are not hypothesis tests, they just measure how good your model fits the data
+* Hypothesis testing can be used to compare nested models
+  * H_0: two models are roughly the same
+  * H_1: not H_0
+  * If they are roughly the same, choose the simpler model
+* For logistic regression models, you use **deviance** rather than sum of squares
+  * Deviance: generalization of the RSS for linear models
+  * The lower the deviance, the better the fit
+  * Deviance test statistic is Deviance of Model I - Deviance of Model II
+* AIC = goodness-of-fit + penalty for number of predictors
+* LASSO
+  * You can choose the lambda value (penalty) yourself, or you can let the computer decide which penalty to use
+  * LASSO models can be biased -> the solution is to use LASSO to select the predictors, and then use the least square method todo inference
+* Type 1 error should be the same as the significance level that we are using (i.e. 0.05 for a 0.05 significance level)
 * 
+
+### Questions
+* Fitting the model on the testing data -> isn't this violating the golden rule?
+  * **Not really -> there are different interpretations**
+* What is the threshold for considering a model to show under or overdispersion? -> none = 1
+  * **0.5 or less is underdispersion, 10 or higher is overdispersion**
+  * **This would be an ambiguous question on a final unless it's very obvious**
+* In logistic regression, if the dispersion param is far from 1, then you should use quasibinomial instead of binomial -> Is this correct?
+  * ****
+* Will we have to draw on the final?
+  * **Will need to draw**
+* Will the final be as time-constrained as the midterm?
+  * **We will have more time -> 6 questions**
+* What is considered independent when it comes to poisson? -> e.g. Number of lectures attended but there are different lecture sections
+* Why do poisson regression models almost always have overdispersion or underdispersion?
+* Are the three different version of log reg considered three different link functions?
+* What is the threshold of R^2 that deems it to be a good model?
+* You mentioned not to worry about Ridge but this was in the tutorial -> how much should we know about it
