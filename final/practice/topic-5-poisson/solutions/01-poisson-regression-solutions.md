@@ -52,7 +52,7 @@ single slope there is fine, but factoring it is clearer.)
 **7.11**. (ii) Temperature increases ridership in **both** groups, but the effect is **weaker on working
 days** (~7.1) than on non-working days (~14.7) — warm weather boosts leisure/weekend riding more than
 commuting. The effect of `temp` **depends on** whether it is a working day (the interaction), so you
-cannot quote a single temperature effect.
+cannot quote a single temperature effect. 
 
 ---
 

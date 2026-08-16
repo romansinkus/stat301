@@ -187,7 +187,7 @@ m2
 
 ---
 
-### Topic 3 Notes:
+# Topic 3 Notes:
 
 * Review from topic 2:
 
@@ -256,7 +256,7 @@ m2
     * Splits experimental units into homogenous blocks to remove the variance from the nuisance factors. Then randomly assigns treatments to each block. Blocks are similar in all aspects except treatment
 * 
 
-# Topic 4: Logisitc Regression
+# Topic 4: Logistic Regression
 
 * The types of regression models are determined by the types of the responses, not the predictors
 * For linear regression models, we assume that teh response is continuous and normally distributed

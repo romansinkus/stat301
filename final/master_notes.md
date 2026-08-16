@@ -2349,3 +2349,167 @@ test**, `χ²(d)` distribution, via **`anova(..., test="Chisq")`**.
 > **deviance** (GLMs), **select** variables carefully (**LASSO**, and never select-and-infer on the same
 > data), report prediction uncertainty with **CIP vs PI**, and only claim **causation when the design
 > (randomization) earns it.**
+
+---
+
+# PROFESSOR'S ANNOTATED SLIDES — exam emphasis, corrections & "why"
+
+*Extracted from the instructor's red-pen annotations on the marked lecture PDFs
+(`slides/prof-annotated-slides/`). These are the points the professor circled, starred,
+posed as questions, or corrected — the emphasis that plain slides don't carry. Organized by topic.*
+
+## Topic 1 — SLR & inference
+
+- **Why do we consider a LINE first? (the professor's own exam-style Q)** — Because a straight line is
+  the **first-order Taylor approximation** of any smooth function: `f(x) ≈ f(x₀) + f'(x₀)·x + …`. The
+  linear model is just the leading term. It needs `f` smooth; a kinked/non-smooth relation breaks it.
+  (This also answers "why is `income²` still *linear* regression": **linear = linear in the parameters,
+  not in the predictors** — `log(X), X², √X` are all fine covariates.)
+- **Slope ⇄ correlation link (worth memorizing):** `β̂₁ = r · (S_y / S_x)`, where `r` is the correlation
+  and `S_y, S_x` the sample SDs (both > 0). So **the sign of the slope = the sign of the correlation.**
+- **X is treated as fixed / "not random"; the data are a sample of size n.** `εᵢ` is the random part =
+  "the variation in Y that cannot be explained by X."
+- The **fitted/sample line has NO error term**: `Ŷ = β̂₀ + β̂₁X` (the professor crossed out the `+ε`). The
+  residual `eᵢ ≠ εᵢ` because `β̂ ≠ β`. Estimates `β̂₀, β̂₁` are **not** the true values (never known).
+- **Two things every estimate carries:** (1) it's **unbiased**, `E(β̂₁)=β₁`; (2) it has **uncertainty**,
+  measured by the SE — the true `β₁` lies (≈95%) in `β̂₁ ± 1.96·SE(β̂₁)`.
+- **SD vs SE (a favourite exam question):** `SD(β̂)=σ/√n` uses the *true* σ; `SE(β̂)=σ̂/√n` plugs in the
+  *estimate* σ̂ (σ is unknown). **SE = the estimated SD of the estimator.**
+- **Sampling-distribution intuition:** fit the SLR on many samples of the same size from the population and
+  the slope changes every time (2.618, 3.017, 2.448, …). "Which one is best? We don't know." `SE(β̂₁)` =
+  the SD of the slope across those repeated samples. From ONE sample you get it two ways: (1) the
+  **theoretical formula** (`lm`), (2) **bootstrap**.
+- **CORRECTION the professor stressed:** taking multiple fresh samples from the full dataset is **NOT**
+  bootstrapping. Bootstrap resamples the ONE observed sample **with replacement** — "population : sample ::
+  sample : bootstrap sample." Bootstrap works for any sample size / any distribution / any statistic
+  (e.g. SE of a median or correlation has no simple formula → bootstrap).
+- **`t*` uses `n − k` df** (k = # regression parameters — generalizes the SLR's `n−2`); `t*_{0.025} ≈ 1.96 ≈ 2`.
+  The classical CI/test assumes **normal errors**; if that fails → bootstrap. As `n→∞`, `t(n)→N(0,1)`.
+- **CI ⇄ test duality (memorize):** the 95% CI for `β₁` **covers 0 ⟺ fail to reject `H₀: β₁=0` at the 5% level.**
+- **CI misinterpretation:** a computed 95% CI does *not* contain the true value "with 95% probability" —
+  once computed, nothing is random; it either covers or it doesn't. The 95% is a property of the *procedure*.
+
+## Topic 2 — MLR, categorical predictors & interactions
+
+- **c-level categorical ⇒ c−1 dummies;** the reference level is "hidden" (coded 0 in every dummy, chosen
+  alphabetically). Each `βⱼ = E(Y|that level) − E(Y|reference)`; `β₀` = mean of the reference level. Here
+  the β's are **NOT slopes/intercepts** even though R labels them so.
+- **Additive model = parallel lines** (`β₀+β₁x₁+β₂x₂` has 3 coefficients but a **common slope**);
+  **interaction = non-parallel lines** (adds the difference-of-slopes term `β₃`).
+- **Reading a profile plot:** lines **parallel ⇒ no interaction** (one variable's effect doesn't depend on
+  the other); lines **crossing / non-parallel ⇒ interaction**; steeper crossing ⇒ stronger interaction.
+- **Testing an interaction:** `H₀: β₃=0` (no interaction) vs `H₁: β₃≠0`. **Power caveat:** a *weak* real
+  interaction gives a small `Z`, large p-value, and gets missed — "fail to reject" ≠ "definitely none."
+- **COMMON MISTAKE (the professor underlined it):** in a model **with an interaction** you **cannot**
+  interpret a coefficient "holding the others constant" — that phrase is valid **only for additive models.**
+  (Tested only on interaction types covered in lecture: one continuous × one categorical.)
+- **Read the SE column** — the professor marks it "the accuracy of the estimate… most important."
+
+## Topic 3 — diagnostics, multicollinearity & causality
+
+- **Residual plot** (residuals vs fitted): a good fit scatters around the line `Y=0` with **no pattern**;
+  a **curve ⇒ non-linearity**, a **funnel ⇒ non-constant variance**. Fix non-linearity by adding
+  transformations/interactions, then **re-check the residual plot**.
+- **Independence** is judged from the **study design**, not a plot. Violations: temporal data, repeated
+  measurements (longitudinal) — "your homework scores aren't independent." If violated, SEs are biased ⇒
+  CIs/tests **invalid** ⇒ don't use ordinary regression.
+- **Equal variance:** `Var(εᵢ)=σ²` constant. Funnel shape in the residual plot ⇒ heteroscedasticity; fix by
+  transforming the **response** (√Y or log Y). Note `log(Y)=β₀+β₁X ⟺ Y=e^{β₀+β₁X}·e^ε` (a *multiplicative* model).
+- **Normality** is the least-severe violation. Diagnose with a **Q-Q plot** (points on a straight line = OK);
+  large `n` (CLT) or bootstrap rescue it.
+- **Multicollinearity:** strong association among **2+** covariates (a common student error is to think it's
+  only pairwise). Perfect collinearity ⇒ R returns **NA** (infinitely many models with the same SSR).
+  Consequence: **inflates SEs ⇒ inflates p-values ⇒ CIs wider ⇒ harder to reject `H₀`.**
+- **VIF is a GUIDELINE, not a rule** (`> 5` or `> 10` flags a problem). For categorical predictors use the
+  **generalized VIF**: compare R's `GVIF^(1/(2·Df))` column to `√5 ≈ 2.23` or `√10 ≈ 3.16` (or square it and
+  compare to 5/10). Fix by **dropping** or **combining** collinear variables.
+- **Causality:** "X causes Y" ≠ "X and Y are associated" — regression finds only association. Watch for
+  **reverse causality**, **Simpson's paradox** (correlation sign *flips* between the whole sample and within
+  strata), and **confounding** (a C causing both X and Y).
+- **CRD** (completely randomized) balances **observed AND unobserved** confounders on average ⇒ the **gold
+  standard**. **RBD** (randomized block) balances only observed confounders, but blocking ⇒ **smaller SD ⇒
+  smaller SE ⇒ smaller p-value ⇒ more power.** Observational studies can't establish causation naively.
+
+## Topic 4 — logistic regression (GLM bridge)
+
+- **The model TYPE is set by the RESPONSE, not the predictors** (continuous+normal → linear; binary →
+  logistic; count → Poisson). GLM unified form: **`h(E(Y)) = linear part`** — identity link ⇒ linear model,
+  logit link ⇒ logistic. A GLM has **no error term** (you model a function of the conditional expectation).
+- **`glm` = maximum likelihood (MLE); `lm` = least squares** — they coincide for normal errors. Logistic MLE
+  has no closed form ⇒ iterative (the "# Fisher scoring iterations"). Bernoulli = Binomial with n=1.
+- **Three scales:** log-odds (raw β), odds (`e^β` = multiplicative factor, `(e^β−1)·100%` = % change), and
+  probability (nonlinear). **Complementary-outcome trick:** flip the sign — if `e^β = 0.081` are the odds of
+  *surviving*, then `e^{−β} = 12.35` are the odds of *dying*.
+- **Additive logistic** (equal log-odds slope) gives probability curves that are **NOT parallel** (they
+  compress near 0 and 1) — unlike the parallel lines of an additive linear model.
+- **GLM inference uses `z` (Wald / Normal), NOT `t`:** `Z = β̂ⱼ/SE(β̂ⱼ) ~ N(0,1)` approximately (large-n,
+  CLT + MLE asymptotics); `CI = β̂ⱼ ± z_{α/2}·SE`. This is the key contrast with SLR/MLR's t-distribution.
+- **WHICH-SCALE R traps:** `predict(type="link")` = log-odds (default), `type="response")` = probability.
+  `augment()`'s `.fitted` = log-odds, but `fitted()` / `$fitted` = probabilities.
+- **Why the logistic residual plot is useless:** raw residuals take only two values ⇒ two straight lines; use
+  the **Pearson residual** `(yᵢ−p̂ᵢ)/√(p̂ᵢ(1−p̂ᵢ))` and a **binned residual plot**.
+- **Overdispersion (the key GLM diagnostic):** model `Var(Y)=φ·p(1−p)` and estimate φ via
+  `family = quasibinomial`. **φ ≈ 1 ⇒ fine; φ ≫ 1 ⇒ overdispersion.** It changes the **SEs, not the point
+  estimates.** (This logistic example had `φ̂ ≈ 0.98` → OK.)
+
+## Topic 5 — Poisson regression
+
+- Poisson `P(Y=k)=e^{−λ}λ^k/k!`; **`E(Y)=Var(Y)=λ`** (mean equals variance — the defining property). Model
+  `log(λ)=β₀+β₁X+…` (log link). Two scales, exactly like logistic: raw β = change in **log-mean** (iClicker
+  trap: "the mean decreases 0.036" is FALSE — it's the *log-mean*); `e^β` = mean-count **ratio/factor**.
+- **FACTOR GOTCHA (the professor: "if this isn't true the results are WRONG!"):** a categorical variable
+  stored as a **number** (season = 1/2/3/4) is treated as **continuous** and gets one coefficient — wrong.
+  `as.factor()` it so R makes `c−1` dummies. Always check the tidy table has the expected number of dummy rows.
+- **Poisson USUALLY over-disperses** (real count variance exceeds its mean). Check with `family=quasipoisson`;
+  this example gave **`φ̂ ≈ 90.6 ≫ 1` ⇒ serious overdispersion, Poisson invalid** (contrast the logistic
+  `φ̂≈0.98`). Same inference machinery as logistic (Wald `z`), same residual story (use Pearson).
+
+## Topic 6 — goodness of fit (linear)
+
+- **`TSS = ESS + RSS` holds ONLY when the model is fit by LS AND has an intercept.** `ESS` = explained
+  variation, `RSS` = residual/noise, `TSS` = total (= residuals of the null model). `R² = ESS/TSS = 1−RSS/TSS`.
+- **Four problems with `R²` (the professor's framing — *why* we need Adj R² and the F-test):** (1) no
+  hypothesis test (unknown distribution); (2) in-sample only; (3) says nothing about out-of-sample
+  prediction; (4) **always increases when you add any variable ⇒ can't compare nested models.**
+- `Adj R² = 1 − [RSS/(n−p−1)] / [TSS/(n−1)]` penalizes large `p`. **`RSE = √(RSS/(n−p−1)) = σ̂`** (the error-SD
+  estimate; the `sigma` column in `glance`). `AIC = fit + penalty` — pick the **smallest** AIC.
+- **F-test — two cases.** Case A (`glance`): full vs the intercept-only null, `H₀: β₁=…=βₚ=0` ("none
+  significant"). Case B (`anova(reduced, full)`): any nested pair, `H₀`: the extra predictors add nothing.
+  `F = [(RSS_red−RSS_full)/k] / [RSS_full/(n−p−1)]`.
+- **t-test vs F-test (clean contrast):** the t-test (`lm`) tests **one** coefficient with the others present;
+  the F-test (`glance`) tests **all** at once (all-vs-nothing). **For a single predictor, `F = t²`** and the
+  p-values match.
+- **Caveat:** rejecting `H₀` (model beats null) does **not** prove your predictor of interest is the driver —
+  another variable in the model may matter as much or more.
+
+## Topic 7 — goodness of fit for GLMs (deviance)
+
+- `R²`/`RSE`/`F` don't carry over (they're built on `yᵢ−ŷᵢ`, for normal responses). Use the **deviance =
+  `2 × (logLik_saturated − logLik_estimated)`** (saturated = perfect-fit model). It **generalizes RSS**
+  (∝ RSS for normal errors); **lower deviance = better fit.**
+- **Deviance test = the GLM analog of the F-test**, but the statistic is **χ²(d)** (d = difference in # of
+  predictors), via `anova(reduced, full, test="Chisq")`. **Linear ⇒ F (exact under normality); GLM ⇒ χ²
+  (large-sample only).**
+
+## Topic 8 — model selection (regularization & post-inference)
+
+- **Stepwise** = greedy, order-dependent, variables fully in/out (coefficients *jump*). **Regularization**
+  shrinks **smoothly**: minimize `RSS + λ·penalty`. **Ridge = L2 (`λΣβⱼ²`), Lasso = L1 (`λΣ|βⱼ|`).**
+- **Lasso vs Ridge (key contrast):** **Lasso can shrink coefficients exactly to 0 ⇒ it selects variables**
+  (simultaneously selects and trains); **Ridge never reaches 0 ⇒ no selection** (it targets multicollinearity).
+  Geometry: Lasso's constraint region is a **diamond** (corners on the axes ⇒ sparsity), Ridge's is a **circle**.
+- **Bias–variance tradeoff:** shrinkage **biases** the estimates but **lowers variance** to improve
+  prediction. `MSE(β̃) = Var(β̃) + bias²`. **Always standardize** the inputs first (`glmnet` does by default).
+- **In `glmnet`:** pass a **matrix** + response vector; **`alpha=1` = LASSO, `alpha=0` = Ridge** (between =
+  Elastic Net). `λ=0` reproduces LS; tune λ by CV. On the `cv.glmnet` plot the **top axis = # non-zero
+  coefficients**; **`lambda.min`** = minimum CV-MSE, **`lambda.1se`** = largest λ within 1 SE of that minimum
+  (simpler model). A `.` in `coef(...)` = a dropped variable.
+- **LASSO must NOT be used for inference** — its coefficients are **biased** (sampling distribution centred
+  off the true β).
+- **Post-inference / double-dipping (a "bad idea"):** if you use the data to **select** a model you can't use
+  the **same** data to make valid inference. The professor's simulation makes it concrete: generate 10
+  covariates with **all true β = 0**, forward-select ≤3, then test on the same data, repeat 1000× — and the
+  **type I error is inflated far above 5%** (many false rejections). Fix: **split the data** (select on one
+  part, infer on the other).
+
+*(Note: Topic 9 — Prediction Uncertainty — has no marked slides in the annotated set.)*
