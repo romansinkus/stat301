@@ -13,7 +13,7 @@ e = error, ŷ = fitted.*
 
 ---
 
-# INDEX (87 blocks)
+# INDEX (91 blocks)
 
 **Topic 1 — SLR & Inference (18)**
 - T1.1 Least squares (LS)
@@ -46,7 +46,7 @@ e = error, ŷ = fitted.*
 - T2.8 Additive vs. Interaction (side-by-side)
 - T2.9 "Common slope" (and why not to assume it)
 
-**Topic 3 — Diagnostics, Multicollinearity & Causality (10)**
+**Topic 3 — Diagnostics, Multicollinearity & Causality (11)**
 - T3.1 LINE assumptions
 - T3.2 Model diagnostics (residual & QQ plots)
 - T3.3 Fixing assumption violations (3 tools)
@@ -57,13 +57,14 @@ e = error, ŷ = fitted.*
 - T3.8 Confounding
 - T3.9 Reverse causality
 - T3.10 Simpson's paradox
+- T3.11 Interpreting log-transformed models (log-level / level-log / log-log elasticity)
 
 **GLM Bridge — Topics 4 & 5 in one idea (3)**
 - GB.1 The link-function idea (the whole trick)
 - GB.2 The three GLM families (pick by response type)
 - GB.3 Two structural facts (no `e`; MLE not LS)
 
-**Topic 4 — Logistic Regression (binary response) (9)**
+**Topic 4 — Logistic Regression (binary response) (10)**
 - T4.1 When to use it + why not ordinary linear regression
 - T4.2 The logit model — three equivalent forms (prob / log-odds / odds)
 - T4.3 Interpreting coefficients — the THREE scales
@@ -73,6 +74,7 @@ e = error, ŷ = fitted.*
 - T4.7 Prediction & fitted values — WHICH scale?
 - T4.8 Residuals — why the residual plot is useless
 - T4.9 Overdispersion (the key diagnostic)
+- T4.10 Overdispersion — the deeper mechanics (variance-locked; individual vs grouped; √φ; quasi trade-off)
 
 **Topic 5 — Poisson Regression (count response) (6)**
 - T5.1 When to use it + two problems that rule out linear regression
@@ -109,17 +111,19 @@ e = error, ŷ = fitted.*
 - T8.6 postLASSO + the fix (split the data)
 - T8.7 Stepwise in R — the tutorial-07 workflow (`regsubsets` / `stepAIC`)
 
-**Topic 9 — Prediction Uncertainty (4)**
+**Topic 9 — Prediction Uncertainty (5)**
 - T9.1 What are you predicting? (average vs. actual)
 - T9.2 CIP vs. PI (side-by-side)
 - T9.3 Why the PI is always wider
 - T9.4 Interpretation templates + the `geom_smooth` band
+- T9.5 The interval band shape (hourglass) & extrapolation
 
-**General — cross-cutting (4)**
+**General — cross-cutting (5)**
 - G.1 Phrasing bank (dense) — G.1a Coefficients · G.1b Inference · G.1c Causation · G.1d ANOVA/diagnostics/multicollinearity
-- G.2 Equations (dense) — G.2a SLR · G.2b MLR · G.2c assumptions & collinearity · G.2d quick calc
+- G.2 Equations (dense) — G.2a SLR · G.2b MLR · G.2c assumptions & collinearity · G.2d quick calc · G.2e Topics 4–9
 - G.3 Reading a regression output table
 - G.4 Terminology / synonyms
+- G.5 Inference distributions — data vs. inference; t vs z; the null yardstick
 
 **Notes — handwritten review (3)**
 - N.1 Topic 1 review points
@@ -253,6 +257,9 @@ A second reason association ≠ causation (besides confounding, T3.8): the **cau
 **T3.10 Simpson's paradox**
 An association can **reverse sign** when you go from the **aggregate** data to **within-group strata** (i.e. after conditioning on a lurking third variable). *Slide example:* 1973 **UC Berkeley** admissions looked biased **against women** overall, yet **within almost every department** women were admitted at rates **as high or higher** — because women applied more to **competitive (low-admission) departments**. Lesson: an unadjusted/marginal association can be **misleading or backwards**; the "right" grouping (here, department — itself a confounder) can flip the conclusion. A vivid case of why **observational associations need the confounders accounted for** (ties to T3.8).
 
+**T3.11 Interpreting log-transformed models (log-level / level-log / log-log elasticity)**
+When diagnostics (T3.3) push you to `log(Y)` or `log(X)`, the **coefficient's meaning changes** — and interpretation is the graded skill, so know all four forms. Let `b` = the slope. **(1) level–level `Y ~ X`:** +1 unit in X → a **b-unit** change in Y (ordinary). **(2) log–level `log(Y) ~ X`** (semi-log): +1 unit in X → Y changes by **(e^b − 1)·100 %** (exact), ≈ **100·b %** for small b (good for |b| < ~0.1). E.g. b = 0.08 → about **+8.3%** per unit — a **percentage / multiplicative** change, NOT "+0.08 dollars" (two errors: wrong scale, and additive-vs-multiplicative). **(3) level–log `Y ~ log(X)`:** +**1%** in X → a **b/100-unit** change in Y; a **doubling** of X → **b·ln2 ≈ 0.693b** change. **(4) log–log `log(Y) ~ log(X)`:** b = the **elasticity** — +**1%** in X → about **b %** change in Y (unit-free, comparable across variables; |b| > 1 = elastic). **Why log at all:** `log(Y)` often fixes the funnel (E) **and** right-skew (N) at once, and it's **still linear regression** ("linear" = in the parameters). A constant **%** effect on the log scale means a **bigger absolute effect where Y is large** (8% of a big number > 8% of a small one).
+
 ---
 
 # GLM BRIDGE — Topics 4 & 5 in one idea
@@ -321,6 +328,9 @@ A logistic model predicts on **whichever scale you ask for**:
 
 **T4.9 Overdispersion (the key logistic/Poisson diagnostic)**
 The model **assumes** `Var(Y)=p(1−p)`. **Overdispersion** = the data's actual variability is **larger than the model assumes**. This **misspecifies the SEs (not the point estimates)** ⇒ CIs and p-values become unreliable. **Detect:** refit with `family=quasibinomial` and read the **dispersion parameter** — correctly specified ⇒ ≈ **1**; **>1 = over-, <1 = under-dispersion** (Titanic ≈ **0.98** ⇒ no problem). **Fix:** the **quasi-likelihood** approach (`quasibinomial`) estimates dispersion and **corrects the SEs**; **coefficient estimates are unchanged.**
+
+**T4.10 Overdispersion — the deeper mechanics (logistic AND Poisson)**
+Extends T4.9/T5.5 with the "why" (heavily tested). **Variance is "locked"** because Bernoulli/Poisson each have **one parameter** (p, λ), so fixing the mean fixes the whole distribution — variance included (`p(1−p)`, `λ`); no free σ² knob, so real data can carry **more spread than the formula allows** = overdispersion. *(Same reason GLMs have no `+e`; the Normal's separate σ² is why linear regression **can't** overdisperse — its analog is heteroscedasticity, a variance-**shape** not **magnitude** issue.)* **Logistic "sometimes" vs Poisson "usually":** individual 0/1 data (n=1/row) is variance-locked → basically can't overdisperse (Titanic ≈0.98), so logistic needs **grouped/binomial** data (hidden heterogeneity) **or clustering** ("sometimes"); a count is **unbounded** and `Var=λ` is a rigid bet real counts break via clustering/bursts ("usually", Bikeshare ≈90.6). **Damages the SEs/p-values, NOT the estimates** (coefficients come from the untouched mean structure; too-small SEs → false significance). **Fix quantitatively:** quasi estimates φ and **multiplies SEs by √φ** (√90.6 ≈ 9.5× wider); φ≈1 → no change; **φ<1 = under-dispersion = safe** (SEs conservative), **φ≫1 = dangerous.** **Why not always quasi / just inflate variance?** Goal is **calibrated** SEs, not big ones (over-inflating → CIs so wide nothing's detectable, no power) → φ is **estimated**; and plain binomial/Poisson is a **real distribution** (→ likelihood → AIC/BIC/LRT, prediction intervals) while **quasi has no likelihood → AIC=NA, no LRT.** Workflow: **fit plain → check φ → quasi only if φ≫1.** **Overdispersion ≠ bad predictions:** overdispersion is a *variance* problem (fix: quasi); wrong predictions is a *mean/accuracy* problem (fix: better predictors, diagnose via deviance/AIC) — the dispersion parameter watches **spread, not correctness.**
 
 ---
 
@@ -463,6 +473,9 @@ The **CIP** only accounts for **uncertainty 1**: our estimated line `b̂0+b̂1X`
 - **PI:** "With **95% probability**, the value of **a (single) house** of size **220 m** is between **\$454,519 and \$965,622**." *(Probability — an individual house's value is itself random. Note how much wider — that's the `e` term.)*
 - **`geom_smooth(se=TRUE)` band:** the shaded band `ggplot` draws around a regression line is the **CIP band** (uncertainty of the *fitted line / average*) — **NOT** a PI, and **NOT** the scatter of the points. (Same "SE of the line ≠ scatter of the points" idea from Topic 1 inference.)
 
+**T9.5 The interval band shape (hourglass) & extrapolation**
+Both the **CIP and PI bands are narrowest at x̄** (the predictor mean) and **flare outward** as X moves away in either direction — an hourglass/bowtie. **Why:** the fitted line effectively **pivots around (x̄, ȳ)** (LS always passes through it), so slope wobble barely moves ŷ near the center but swings it more and more at the extremes; the uncertainty in ŷ grows with the distance **(X − x̄)**. The **PI adds the constant σ² floor** (the individual error e) on top, so it's wider everywhere and stays wide even at x̄ (its extra ingredient does **not** depend on (X − x̄)). **Extrapolation** far outside the data makes BOTH the point estimate *and* the band width untrustworthy — the interval balloons, so even taking the model at face value the prediction is nearly uninformative. The `geom_smooth(se=TRUE)` shaded band is this **CIP band** (uncertainty of the mean line), narrowest at x̄ — **NOT** where 95% of individual points fall (that's the wider PI).
+
 ---
 
 # GENERAL (cross-cutting)
@@ -549,6 +562,9 @@ In `tidy()` / `get_regression_table()` output, each **row = one coefficient**, e
 
 **G.4 Terminology / synonyms**
 Same idea, different word — the exam may not match your notes. **Inputs:** `predictor = covariate = input variable = independent/explanatory variable = X` (all the RHS variables). **Output:** `response = outcome = dependent variable = Y` (must be **continuous** for linear regression). **Fit pieces:** `fitted = predicted = ŷ`; `error = ε = disturbance` (**true, unobservable**) **≠** `residual = ê` (**observed** `y − ŷ`); `SSR = SSE = RSS` (sum of squared residuals). **Parameters:** `coefficient = parameter = β` (true) vs `b̂ / β̂` (estimate). **Others:** `slope = b̂1`; `intercept = b̂0`; `σ̂ = residual standard error` (scatter of points) vs `SE(b̂) = standard error` (wobble of the estimate); `multicollinearity` = association **among predictors** (not predictor-with-response); `homoscedasticity = constant/equal variance`, `heteroscedasticity = non-constant variance`.
+
+**G.5 Inference distributions — data vs. inference; t vs z; the null yardstick**
+**Data distribution ≠ inference distribution:** the *data* distribution = shape of one Y (Normal/Bernoulli/Poisson); the *inference* distribution = sampling distribution of a statistic (b̂/SE) across samples (t or z) — they needn't match, e.g. **Poisson data is nothing like Normal yet inference is z**, because the **CLT / MLE asymptotic normality** makes *estimates* ≈ Normal even when raw data isn't. **Linear → t, GLM → z** (same statistic b̂/SE, different reference): linear estimates a **separate σ²** → extra uncertainty → **t** (fatter tails, df=n−k); GLMs have **no free σ²** → straight to **Normal z**, but only **large-sample (MLE)** → GLM inference is *approximate*, linear's t *exact*; t→Normal as df grows (cutoff→1.96). **t vs Normal:** same bell, t has **fatter tails** because it *estimates* σ (Normal assumes σ known); small df = bigger cutoff than 1.96. **Reference dist centered at 0 = the NULL yardstick, not a belief β=0:** you standardize against 0 (z=(b̂−0)/SE) and ask "if β were 0, would a z this extreme surprise me?" — far tail → reject 0. **r→R² trap:** given a correlation, **square it** — r=0.3 → R²=0.09 (9%), NOT 30% (cousin of the odds-ratio %-change slip — don't skip the transformation).
 
 ---
 

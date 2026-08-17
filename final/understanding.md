@@ -95,12 +95,194 @@ things together. Ask me later: *"what am I strong on?"*, *"what should I review?
 
 ---
 
-## Topic 1: Simple Linear Regression
+## Topic 5: Poisson Regression & Overdispersion
 
-⚪ Not covered in our conversations yet.
+### 🟢 Strong
+
+- **Response type & why not linear.** Poisson = non-negative integer counts; linear
+  fails on the range problem (predicts negatives) and the variance problem
+  (`Var = λ = mean` breaks Equal-Variance / the "E" in LINE).
+- **The two ratio scales (3a-i).** Exponentiating a GLM coefficient gives a
+  multiplicative *ratio*: **odds ratio** (logistic, scales the odds) vs. **rate
+  ratio** (Poisson, scales the mean count). Both from `exp()`; differ only in what
+  they multiply.
+- **`Var(Y|X)` contrast (3a-ii).** Logistic `p(1−p)`; Poisson `λ = E[Y|X]`. In both,
+  variance is *locked to the mean* (not a free parameter) — that's *why*
+  overdispersion is even possible.
+- **Which overdisperses (3a-iii, 3b).** Poisson **usually**, logistic **sometimes**.
+  Reason nailed after a long deep dive: `Var = λ` is one rigid knob real counts
+  routinely break (clustering/bursts); `Var = p(1−p)` is *automatically locked* per
+  individual 0/1 obs → can't overdisperse unless data is **grouped or correlated**.
+
+### 🟢 Strong — overdispersion mechanism (deep-dived, moved 🔴→🟢)
+
+- **"Variance is locked" = one-parameter distributions.** For a 0/1 outcome, mean
+  (`p`) fixes the *entire* distribution, variance included (`Y²=Y` ⇒ `Var=p−p²`).
+  For a count, mean fixes only the center; spread stays free, so Poisson *imposes*
+  `Var=λ` as an extra bet reality often loses.
+- **How logistic overdispersion actually arises.** Two routes: (1) **grouping /
+  binomial** data (counts-out-of-`n`) where a shared `p` hides real heterogeneity;
+  (2) **correlation/clustering** (families on the Titanic, repeated measures). Coin
+  example: 10 flips/day, secret sunny(p=.9)/rainy(p=.1) days → same mean 5, variance
+  ~16 not 2.5. Individual coins still locked; the *single-p, independent* assumption
+  is what fails.
+- **Individual vs grouped format.** Titanic/World-Cup style = one row per
+  person, `n=1` → variance locked → basically **can't overdisperse** (φ≈1). Grouped
+  (successes-out-of-n) or clustered → can. This is the "usually vs sometimes" split.
+- **When you actually reach for quasibinomial.** Only grouped/proportion or
+  clustered data (seed-plots, patients-in-hospitals). You *fit and check* φ̂: ≈1 →
+  keep plain family; ≫1 → keep quasi (widens SEs). Titanic 0.98 / a World-Cup
+  individual fit 0.83 → no problem, don't switch. Bikeshare Poisson 90.6 → switch.
+- **φ < 1 = underdispersion** (safe direction: SEs slightly conservative); φ ≫ 1 is
+  the dangerous one (SEs too small → false significance).
+- **Overdispersion ≠ bad predictions.** Overdispersion is a *variance* problem (fix:
+  quasi family). Getting predictions *wrong* is a *mean/accuracy* problem (fix:
+  better predictors; diagnose via deviance/AUC/misclassification). The dispersion
+  parameter watches spread, not correctness. Also distinct from irreducible coin-flip
+  noise (a 70%-then-doesn't-score player is *not* a model error).
+- **Why linear has `+e` but logistic/Poisson don't.** Normal has a *separate,
+  additive* variance knob (`σ²`) → noise peels off as `+e`. Bernoulli/Poisson are
+  *one-parameter* → setting the mean (`p`/`λ`) locks the variance; randomness is
+  baked into the coin flip / count draw, not an additive term. Same "variance locked
+  by mean" idea from the other side. Overdispersion can't exist in linear regression
+  (its analog is heteroscedasticity — non-constant `σ²`, a *shape* not *magnitude*
+  issue).
+
+- **Poisson inference (3d).** Statistic = **Wald z = β̂/SE(β̂)**; reference dist =
+  **standard Normal** (GLM uses z, linear uses t — because GLM has no separate σ² to
+  estimate). Justified by **asymptotic normality of the MLE** (large-sample, so GLM
+  inference is *approximate* vs. linear's *exact* t). Equivalence: **|z|>1.96 ⟺ 95%
+  CI for β excludes 0 ⟺ p<0.05** (⟺ rate-ratio CI excludes 1). Inference is on the
+  **β (log-mean) scale**; exponentiate only to *report* the rate ratio.
+- **3c overdispersion read (φ ≈ 90.6).** (i) severe overdispersion, true variance
+  ~90× assumed; (ii) SEs/p-values untrustworthy (too small → false significance),
+  coefficients still valid (mean structure untouched); (iii) quasi-Poisson keeps
+  estimates but multiplies SEs by **√φ** (~9.5×), vs. Titanic φ≈0.98 → √φ≈1 → no fix.
+- **Plain family vs. quasi — the trade-off.** Plain binomial/Poisson is a *real
+  distribution* (→ likelihood → AIC/BIC/LRT, simulation, prediction intervals,
+  efficient when φ≈1); quasi is only a mean–variance spec (no likelihood → AIC=NA,
+  no LRT) but gives honest SEs under overdispersion. Workflow: fit plain → check φ →
+  switch to quasi only if φ ≫ 1.
+
+### 🟡 Watch
+
+- **Interaction rate ratios need a group tag (2d).** In an interaction model the
+  main-effect ratio (`e^b_temp = 14.7`) applies to the **reference group only**
+  (non-working days); working days = 14.7 × 0.483 ≈ 7.1. Must state the group — not
+  "implied." Long confusion here, now resolved via the on/off-switch framing.
+- **Always say "mean/expected count"** in Poisson interpretations (rate ratio
+  multiplies the *mean*, not "the number of bikers").
 
 ---
 
-## Topics 2–3, 5+
+## Topic 6: Goodness of Fit (linear / LS)
 
-⚪ Not covered yet.
+### 🟢 Strong
+
+- **The null model & what GoF compares against (1a).** Null = intercept-only
+  `Y=b0+e`, predicts the **sample mean `ȳ`** for everyone (it's the LS fit with no
+  predictors). Comparing a model to it asks "does `X` explain variation `ȳ` alone
+  can't — is it better than *nothing*?" Self-corrected the over-eager use of
+  "significant" (that's the F-test's job, not R²'s — see below).
+- **Nothing here is a population parameter.** Cleared up own worry: `ȳ`, `ŷᵢ`, `yᵢ`
+  are all computed from the sample; SS formulas measure distances between known
+  quantities, no population mean needed. `ŷ`↔`E[Y|X]`, `ȳ`↔`E[Y]` are both estimates.
+- **Sums of squares (1b), plain-English.** TSS = total variation to explain; ESS =
+  what the model explained; RSS = what it missed. `TSS = ESS + RSS` holds **only with
+  (1) intercept + (2) LS fit**. **LS minimizes RSS** (⇒ maximizes ESS & R², since TSS
+  fixed).
+- **Decomposition breaks for GLMs.** Connected it himself: GLMs are MLE-fit, so the
+  LS decomposition (and hence R²/adjR²/RSE/F-test) doesn't apply → that's exactly why
+  Topic 7 exists (deviance replaces RSS, χ² test replaces F). Grasped Topic 6 = linear
+  version, Topic 7 = parallel GLM version of the same story.
+- **`r²` vs `R²`.** `r²` = squared correlation (pair of variables / SLR only); `R²` =
+  `1−RSS/TSS` (any model). Equal in SLR (`R²=r²`); only `R²` survives into MLR.
+- **Explain signal, not noise.** Understood that RSS→0 / R²→1 is *bad* (overfitting —
+  fitting irreducible noise `e`); low R² (e.g. protein~mRNA 0.09) can be an honest
+  useful model in noisy observational data.
+- **R² has no distribution → not a test (2a-ii).** Deep-dived: a significance test
+  needs a statistic with a *known distribution under H₀* to get a p-value (ties to the
+  3d reference-distribution idea); R² is a descriptive 0–1 ratio with none, so it can
+  only *describe*, not *test*. The F-test = R² repackaged (same RSS/TSS) into a form
+  that follows the known F-distribution.
+- **Three R² caveats (2a).** In-sample only (says nothing out-of-sample); not a test;
+  always ↑ with any predictor (even useless) → use **adjusted R²** to compare sizes.
+
+### 🟢 Strong — inference distributions (t vs z), deep-dived
+
+- **Linear → t, GLM → z.** Same statistic (`β̂/SE`), different reference dist. Linear
+  estimates a separate `σ²` → extra uncertainty → fatter-tailed **t** (df=n−k); GLM
+  has no free `σ²` (variance locked to mean) → straight to **Normal z** (large-sample
+  MLE result, so *approximate* vs linear's *exact*).
+- **t vs Normal.** Same bell shape; t has **fatter tails** because it *estimates* σ
+  (Normal assumes σ known). Small df → fat tails → bigger critical value (>1.96);
+  df→∞ → t converges to Normal (crit → 1.96).
+- **Distribution of DATA ≠ distribution for INFERENCE.** Sharp question. Data dist =
+  shape of one `Y` (Normal/Bernoulli/Poisson); inference dist = sampling dist of an
+  *estimate* (`β̂/SE`: t or z). Poisson data is nothing like Normal yet inference is z
+  — because the CLT / MLE asymptotic normality makes *estimates* Normal even when raw
+  data isn't.
+- **Reference dist centered at 0 ≠ "β is usually 0."** It's the **null** ("no effect")
+  yardstick — "if β were 0, how would z scatter?" — the hypothesis you test *against*,
+  not a belief. Far-tail z → reject 0.
+
+### 🔴 Weak — recurring "don't skip the transformation" family
+
+- **Squaring `r` to get R² (1d).** Wrote `r=0.3 → R²=0.3`; correct is `R²=r²=0.09`.
+  Same *cousin* as the Topic 4 odds-ratio arithmetic slip — a "forgot the
+  transformation step" error. **Rule:** given a correlation, always **square it**;
+  `r=0.3` explains only **9%**, not 30%.
+
+### 🟢 Strong — what "statistically significant" actually means (deep-dived)
+
+- **Core:** significant = "the pattern is too big to be a plausible fluke of random
+  sampling." Because we have a *sample* (which wobbles), even a true no-effect world
+  can throw up an apparent pattern by luck; significance asks whether the pattern is
+  extreme enough to rule that out. Landed via the **coin analogy** (7/10 heads = not
+  significant; 70/100 = significant; same proportion, sample size changes plausibility
+  of "just chance").
+- **Machinery:** assume the null → p-value = P(data this extreme | null true) → small
+  p (<0.05) = surprising under no-effect → reject → significant. In regression:
+  `z = β̂/SE` = "how many SEs from 0"; significance = estimate **relative to its
+  noise**, not raw size.
+- **Significant ≠ large/important** (evidence vs. effect size): tiny effects go
+  significant with huge n; big effects can be non-significant with tiny n. Report both.
+- **Why R²/AIC/RSE/MSE aren't significance:** descriptive numbers with **no null
+  reference distribution** → no "how surprising by chance" probability → no p-value.
+  Only a **test** (F/t/z/χ²) has a known null distribution, so only a test establishes
+  significance. (This is why the F-test — not R² — answers "is the model real?")
+
+### 🟡 Watch — wording
+
+- Say **"variation in `Y`"** (the response), not "variance in the data," when
+  interpreting R². Reserve **"significant"** for the F-test, not R²/descriptive
+  comparisons.
+- **F-test conclusion framing (3a-iii):** state the **decision** (reject, since
+  p<0.05) → meaning (≥1 slope ≠ 0, model beats the intercept-only null) → caveats (not
+  *which* predictor, not good prediction). Gave the *alternative* instead of a
+  conclusion at first.
+
+---
+
+## Topic 1: Simple Linear Regression
+
+⚪ Not directly drilled yet (but many SLR ideas surfaced via Topic 6: `R²=r²`, the
+null model, `ȳ` as the LS intercept-only fit, t-inference). Created `practice_2`
+gap-drills for estimation formulas & SD-vs-SE.
+
+---
+
+## Topics 2–3
+
+⚪ Not covered in conversation yet. `practice_2` gap-drills exist (MLR prediction &
+practical significance; log-transformed model interpretation).
+
+---
+
+## Note: practice sets
+
+Two practice folders exist: `practice/` (concepts, all 9 topics + mock exam) and
+`practice_2/` (computation gaps: by-hand prediction for logistic/Poisson, computing
+F/deviance, reading LASSO plots, CIP/PI band shape). Advised **against** a `practice_3`
+— better to *do* existing sets, run the timed mock, and drill the 🔴 odds-ratio /
+squaring arithmetic.

@@ -1,7 +1,7 @@
 # Practice 01 (Topic 6) — Goodness of Fit for Linear Models (R², Adjusted R², F-test)
 
 *Topic 6. Solutions: [`solutions/01-r2-anova-ftest-solutions.md`](solutions/01-r2-anova-ftest-solutions.md).
-Course case study: predicting protein from mRNA.*
+Course case study: predicting protein from mRNA.* 
 
 > **Exam-style.** Written short answer only. **Show the key steps** (70% procedure, 30% answer). Circle
 > final numeric answers, and respect any word limits. A simple calculator is allowed.
