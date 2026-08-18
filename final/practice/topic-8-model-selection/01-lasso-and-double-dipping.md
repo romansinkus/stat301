@@ -1,4 +1,4 @@
-# Practice 01 (Topic 8) — Model Selection (Regularization & Post-Inference)
+# Practice 01 (Topic 8) — Model Selection (Regularization & Post-Inference) 
 
 *Topic 8. Solutions: [`solutions/01-lasso-and-double-dipping-solutions.md`](solutions/01-lasso-and-double-dipping-solutions.md).
 Course dataset: Ames Housing (`SalePrice`).*

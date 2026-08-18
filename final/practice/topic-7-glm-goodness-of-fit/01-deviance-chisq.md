@@ -3,7 +3,7 @@
 *Topic 7. Solutions: [`solutions/01-deviance-chisq-solutions.md`](solutions/01-deviance-chisq-solutions.md).*
 
 > **Exam-style.** Written short answer only. **Show the key steps** (70% procedure, 30% answer). Justify
-> every true/false, and respect any word limits.
+> every true/false, and respect any word limits. 
 
 ---
 

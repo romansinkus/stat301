@@ -264,6 +264,178 @@ things together. Ask me later: *"what am I strong on?"*, *"what should I review?
 
 ---
 
+## Topic 7: Goodness of Fit for GLMs (Deviance)
+
+### 🟢 Strong
+
+- **Deviance = the GLM's misfit = "RSS for GLMs."** Solid after working the
+  concept: deviance `= 2·(logLik_saturated − logLik_model)` = the log-likelihood
+  **gap** between your model and the **saturated (perfect)** model (one parameter
+  per data point, hits every obs exactly). Measures **distance FROM perfect**, so
+  it's a *misfit* score → **lower = better**; deviance 0 = perfect fit. Corrected
+  own earlier "deviance = how saturated a model is" (it's misfit, not saturation).
+- **Null vs residual deviance (1b).** Null deviance = intercept-only model;
+  residual deviance = fitted model. A big **drop** (residual ≪ null) *describes*
+  how much the predictors improved fit — but that's **descriptive**, not
+  significance (significance needs the χ² deviance test). Same descriptive-vs-
+  significance split flagged repeatedly.
+- **Saturated ≠ best (1c, overfitting).** A model through every point overfits —
+  memorizes noise, perfect on training / bad on new data. Course prefers
+  good-but-not-perfect. Named overfitting correctly after a nudge.
+- **The deviance test (2a/2b).** Nested GLMs: H₀ = extra coefs all 0; statistic =
+  **deviance drop** `= Dev(reduced) − Dev(full)` (always ≥ 0 — MLE can zero the
+  extras, so reduced always has larger deviance); reference **χ²(d)**, d = number
+  of extra coefficients (categorical adds L−1); `anova(reduced, full,
+  test="Chisq")`; p<0.05 → keep bigger model. Worked the sign/naming carefully
+  (statistic is the *drop*, not "residual − null"; "null deviance" is only the
+  model-vs-null special case).
+- **Deviance ↔ RSS parallel.** Locked the mapping: RSS↔deviance, RSS drop + F ↔
+  deviance drop + χ², LS↔MLE. "Perfect fit = 0" on both.
+
+### 🟢 Strong — why GLMs swap the whole LS toolkit (deep-dived, 2c/2d)
+
+- **Why no F-test / no R² for GLMs.** The F-test rides on the RSS decomposition
+  (TSS=ESS+RSS), which exists **only** because LS makes residuals orthogonal to
+  fitted values (Pythagorean split). GLMs are **MLE-fit, not LS** → no RSS, no
+  decomposition → no F, no R². Replacement: deviance + χ².
+- **Why LS itself fails for GLMs (three reasons, deep-dived).** (1) a straight line
+  is unbounded → predicts P>1 or negative counts (link function fixes this); (2) LS
+  assumes one constant-width band (σ²) but GLM variance moves with the mean
+  (p(1−p), λ) → LS mis-weights points → wrong SEs; (3) minimizing squared error
+  **is** MLE *only* for Normal constant-variance noise — for Bernoulli/Poisson the
+  likelihood is a different formula, so best-fit maximizes *that*, not squared
+  error. **The one domino:** response no longer Normal-constant-variance → LS→MLE →
+  RSS→deviance → F→χ². Started confused ("why can't we use LS"), ended solid.
+- **Exact vs approximate (2c).** F-test is **exact** given Normality (holds at any
+  n; weak spot = *violated assumptions*, not small n). Deviance χ² test is a
+  **large-sample approximation** (weak spot = small n / sparse cells / fitted probs
+  near 0 or 1). Same exact-vs-approximate split as **t (exact) vs z (approximate)**
+  — exact tools travel together (t, F), approximate together (z, χ²).
+
+### 🟡 Watch
+
+- **AIC/BIC work for both** linear and GLM (likelihood-based) — the single
+  criterion that crosses the divide. But **NA for quasi** families (no likelihood).
+- Keep saying **"deviance drop"** for the statistic (not "residual − null
+  deviance", which flips the sign and only names the model-vs-null case).
+
+---
+
+## Topic 8: Model Selection (Regularization & Post-Inference)
+
+### 🟢 Strong
+
+- **Stepwise limitations (1a).** (i) **Greedy/path-dependent**: adds/removes the
+  single best variable by AIC each step and **never reconsiders**, so the entry
+  *order* is locked in → can settle on a suboptimal subset and miss the best model.
+  (ii) **All-or-nothing**: a variable is either out (coef=0) or in at its **full
+  OLS size** — a hard binary. Regularization is **smooth**: λ continuously shrinks
+  all coefficients toward 0 (LASSO to exactly 0) → more stable, explores the
+  trade-off gradually.
+- **Regularized objective (1b).** minimize **fit + λ·penalty**: `RSS + λ·Σ|βⱼ|`
+  (LASSO). Fit term (RSS) wants to match data; penalty term (λΣ|β|) punishes big
+  coefficients. λ = tuning knob for bias–variance: **λ=0 ⇒ ordinary LS** (objective
+  = RSS); larger λ ⇒ more shrinkage (LASSO → exactly 0). Intercept **not** penalized.
+  Understood the LHS is just the **objective function** (argmin over β), not a named
+  identity like TSS=ESS+RSS.
+- **Ridge vs LASSO (1c).** Ridge L2 (λΣβ²) shrinks but **never to exactly 0** →
+  keeps all predictors, **no selection**. LASSO L1 (λΣ|β|) snaps coefficients to
+  **exactly 0** → shrinks **and selects**. Caught own error (had Ridge "selects =
+  YES"); locked that the last two table columns must match (NO/NO vs YES/YES).
+- **Why Ridge can't zero (deep-dived).** Ridge penalty force = derivative 2λβ
+  **fades to 0** as β→0 (β² smooth at 0) → only approaches 0 asymptotically. LASSO
+  force = **constant λ** (|β| has a **kink at 0**) → strong enough to pin
+  coefficients exactly at 0. Also got the geometry (L1 diamond corners on axes vs L2
+  smooth circle). The corner = selection.
+- **λ=0 anchor (2a-i).** λ=0 ⇒ penalty off ⇒ pure RSS ⇒ **ordinary least squares**
+  (all predictors at full size, no shrinkage/selection). As λ climbs, coefficients
+  move away from OLS values.
+
+### 🟢 Strong — how λ is chosen (2b, long deep-dive, several misconceptions fixed)
+
+- **Two-loop structure, fully grasped.** Outer loop = grid of λ's; inner loop =
+  k folds. **Objective fits β (given λ); cross-validation picks λ.** Repeatedly
+  self-corrected the trap of "pick λ by minimizing the objective" — that always
+  gives λ=0 (objective monotonically ↑ with λ; penalty baked in → not comparable
+  across λ).
+- **The compared value = held-out MSE/RSS.** For fixed λ: fit on k−1 folds → use
+  those **frozen** coefficients → compute **RSS on the held-out fold** → average
+  over folds = that λ's **CV error**. Key: it's RSS on **held-out** data (not
+  training → can rise again → real U-shaped minimum) with **no penalty term** (same
+  yardstick for all λ). Pick smallest CV error.
+- **CV folds ≠ real test set.** CV carves folds *within training*; the real test
+  set is **untouched** during tuning (else optimistically biased) and used **once at
+  the end**.
+- **Frozen-vs-refit (the subtle part he flagged).** *During* CV the fold
+  coefficients are **disposable** (fit on 4 folds, used frozen to score the 5th,
+  discarded). *After* CV picks λ, **refit once on the full data** at that λ → those
+  are the **final** coefficients. "Disposable measuring instruments vs keeper coefs."
+- **lambda.min vs lambda.1se.** CV error has SE bars, so λ's near the min are
+  statistically **tied**. `lambda.min` = lowest CV error; `lambda.1se` = **largest
+  λ (simplest model) within 1 SE of the min** → parsimony at no real accuracy cost
+  (course usually prefers it). Got it via the "two commutes, same time ±5 min, take
+  the simpler route" analogy.
+- **The λ grid.** Not arbitrary/not chosen by hand: `glmnet` computes **λ_max** from
+  data (smallest λ that zeros every coef) → λ_min = small fraction of it (≈OLS) →
+  ~100 **continuous, log-spaced** values between. λ's are **decimals, not integers**.
+
+### 🟢 Strong — bias–variance & standardization (2c)
+
+- **Why accept bias.** MSE = Variance + Bias². Shrinkage adds a little **bias** but
+  sharply cuts **variance** (unpenalized coefs are unstable when predictors are
+  many/correlated or n small) → total MSE **falls** → better on new data. Nailed the
+  net-trade framing; added the *why variance drops* mechanism after a nudge.
+- **Where LASSO shines: p ≈ n or p > n.** When p>n **OLS is undefined** (no unique
+  solution); p≈n → OLS wildly high-variance. LASSO makes it **solvable** and selects
+  a **sparse subset** (high-dimensional/genomics setting).
+- **Standardize first.** L1 penalty punishes **large coefficients**, and coefficient
+  size is set by each predictor's **arbitrary units** (small-scale predictor → big
+  coef → penalized/dropped harder). Standardizing (mean 0, SD 1) makes coefficients
+  comparable so the penalty reflects **true importance, not measurement scale**.
+  Corrected own reversed direction (thought big-coef predictor "overpowers" and drops
+  the small ones — actually the **big-coef** one is penalized/dropped more).
+
+### 🟢 Strong — LASSO is not linear-only
+
+- **Generalizes to GLMs.** Objective = **fit + λ·penalty** where "fit" swaps
+  **RSS→deviance** (same Topic 7 domino): penalized logistic/Poisson via
+  `glmnet(family="binomial"/"poisson", alpha=1)`; CV scored on held-out **deviance**.
+  Connected himself: "fit" is generic *so the framework isn't linear-specific."
+
+### 🟢 Strong — double-dipping / post-selection inference (Problem 3)
+
+- **What double-dipping is (3a).** Using the **same data twice**: dip 1 = **select**
+  variables, dip 2 = **test their significance / report p-values**. Selection
+  cherry-picks predictors that look strong in *this* sample (some by **noise**), so
+  same-data testing gives **artificially low p-values** → declares noise significant
+  → **inflates Type I error (false-positive) rate** → inference **invalid**. Root
+  cause: p-values pretend variables were chosen *independently* of the data, but
+  selection already used it. Worked out the two dips himself via Socratic prompts.
+- **The simulation (3b).** ~1000 datasets in a **pure null world (all true coefs =
+  0)** → *any* "significant" flag is **provably a false positive**. Each dataset:
+  select on the data → test significance on the **same** data → record if anything
+  came out significant. **Punchline:** false-positive rate should be **α=5%** but
+  double-dipping inflates it **far above 5%**. **Fix = data splitting** → back to the
+  honest 5% (false positives still occur, but only at the α we set). Clarified
+  1000 = **datasets/reps** (to estimate a *rate*), not observations; α vs
+  confidence-level terminology (α=0.05, conf=0.95).
+- **postLASSO caveat (3c).** postLASSO = LASSO to **select**, then refit the
+  **unpenalized** model on survivors (**OLS** for linear, **MLE/log-likelihood** for
+  GLMs) → removes **shrinkage** bias only. It does **NOT** fix **selection** bias
+  (winner's curse — selected coefs biased away from 0), and same-data p-values are
+  still double-dipping → invalid. postLASSO specifies only the **refit method, not
+  held-out data** — two independent choices (OLS-refit fixes shrinkage; data-split
+  fixes selection). Nailed the two-different-biases distinction after a deep-dive.
+- **The clean workflow.** LASSO to **select** → unpenalized refit to **de-shrink** →
+  on a **separate split** to make inference **valid**. Two fixes for two problems.
+- **Overarching takeaway (3d).** Selection and inference **can't honestly share the
+  same data**; remedy = **split the data** (select on one part, infer on another).
+- **Generalizes to GLMs.** Whole double-dipping story is model-agnostic — for GLMs,
+  postLASSO = refit unpenalized `glm()` by MLE, same-data z/deviance p-values still
+  invalid.
+
+---
+
 ## Topic 1: Simple Linear Regression
 
 ⚪ Not directly drilled yet (but many SLR ideas surfaced via Topic 6: `R²=r²`, the

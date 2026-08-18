@@ -1,4 +1,4 @@
-# Solutions 01 (Topic 9) — Prediction Uncertainty (CIP vs. PI)
+# Solutions 01 (Topic 9) — Prediction Uncertainty (CIP vs. PI) 
 
 *Questions: [`../01-cip-vs-pi.md`](../01-cip-vs-pi.md).*
 
